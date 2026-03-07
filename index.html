@@ -517,14 +517,13 @@ html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bp)
   </div>
   <div class="cl">
 
-    <!-- Курс 1 — Ройгон -->
+    <!-- ══ Курс 1 — РОЙГОН ══ -->
     <div class="cc a1" data-type="free">
-      <div class="c-video" onclick="playVideo('YOUTUBE_ID_1','Кӯдаки дарун чист?')">
-        <!-- 📸 ПРЕВЬЮ ВИДЕО 1: замените src на реальный thumbnail из Cloudinary/YouTube -->
-        <img class="c-thumb" src="https://images.unsplash.com/photo-1476234251651-f353703a034d?w=400&h=225&fit=crop" alt="Курс 1" loading="lazy">
+      <div class="c-video" onclick="openPlaylist()" style="cursor:pointer">
+        <img class="c-thumb" src="https://img.youtube.com/vi/tzEkJ_OpkPs/hqdefault.jpg" alt="Кӯдаки дарун чист?" loading="lazy">
         <span class="v-bdg bf">РОЙГОН</span>
         <div class="v-play">▶️</div>
-        <span class="v-dur">7:24</span>
+        <span class="v-dur">3 қисм</span>
       </div>
       <div class="c-body">
         <div class="c-tags"><span class="ctag">Мафҳум</span><span class="ctag">3 аломат</span><span class="ctag">Қадами аввал</span></div>
@@ -532,24 +531,24 @@ html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bp)
         <div class="c-desc">Дарси муқаддимавии ройгон. Фаҳмед, ки кӯдаки дарун чист ва чаро ин барои зиндагии шумо муҳим аст.</div>
         <div class="c-foot">
           <div class="c-price pfree">Ройгон</div>
-          <a href="https://t.me/Jannat_Abdullaeva_Admin" target="_blank" class="bbuy">Тамошо кунед</a>
+          <button class="bbuy" onclick="openPlaylist()">Тамошо кардан</button>
         </div>
       </div>
     </div>
 
-    <!-- Курс 2 — Пулакӣ -->
+    <!-- ══ Курс 2 — ПУЛАКӢ ══ -->
     <div class="cc a2" data-type="paid">
-      <div class="c-video c-video-alt1" onclick="playVideo('YOUTUBE_ID_2','Шифои Асосӣ')">
-        <!-- 📸 ПРЕВЬЮ ВИДЕО 2 -->
+      <div class="c-video c-video-alt1" style="cursor:pointer" onclick="document.getElementById('promoNote2').style.display='block'">
         <img class="c-thumb" src="https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=400&h=225&fit=crop" alt="Курс 2" loading="lazy">
         <span class="v-bdg bp2">ПУЛАКӢ</span>
         <div class="v-play">▶️</div>
-        <span class="v-dur">12:50</span>
+        <span class="v-dur">Промо</span>
       </div>
       <div class="c-body">
         <div class="c-tags"><span class="ctag">20+ дарс</span><span class="ctag">Машқ</span><span class="ctag">Гувоҳнома</span></div>
         <div class="c-title">Шифои Асосӣ — 4 ҳафта</div>
-        <div class="c-desc">Барномаи 4-ҳафтаина барои шифои захмҳои кӯдакӣ. Дарсҳои видеоӣ, машқҳои амалӣ ва дастгирии гурӯҳӣ.</div>
+        <div class="c-desc">Барномаи 4-ҳафтаина барои шифои захмҳои кӯдакӣ. Дарсҳои видеоӣ, машқҳои амалӣ ва дастгирии гурӯҳӣ 🌱</div>
+        <div id="promoNote2" style="display:none;font-size:11px;color:var(--muted);margin:6px 0;padding:8px;background:var(--gp);border-radius:8px;">⏳ Промо-видео тез илова мешавад!</div>
         <div class="c-foot">
           <div class="c-price">350 сом.</div>
           <a href="https://t.me/Jannat_Abdullaeva_Admin" target="_blank" class="bbuy">Харидан</a>
@@ -557,19 +556,19 @@ html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bp)
       </div>
     </div>
 
-    <!-- Курс 3 — Пулакӣ -->
+    <!-- ══ Курс 3 — ПУЛАКӢ ══ -->
     <div class="cc a3" data-type="paid">
-      <div class="c-video c-video-alt2" onclick="playVideo('YOUTUBE_ID_3','Муносибатҳои солим')">
-        <!-- 📸 ПРЕВЬЮ ВИДЕО 3 -->
+      <div class="c-video c-video-alt2" style="cursor:pointer" onclick="document.getElementById('promoNote3').style.display='block'">
         <img class="c-thumb" src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=225&fit=crop" alt="Курс 3" loading="lazy">
         <span class="v-bdg bp2">ПУЛАКӢ</span>
         <div class="v-play">▶️</div>
-        <span class="v-dur">15:10</span>
+        <span class="v-dur">Промо</span>
       </div>
       <div class="c-body">
         <div class="c-tags"><span class="ctag">Психология</span><span class="ctag">Ҳудудгузорӣ</span><span class="ctag">Машқ</span></div>
         <div class="c-title">Муносибатҳои солим</div>
-        <div class="c-desc">Чӣ тавр муносибатҳои солим созед ва аз намунаҳои нодурусти гузашта раҳо шавед.</div>
+        <div class="c-desc">Аз намунаҳои нодурусти гузашта раҳо шав. Муносибатҳои солим биёмӯз 💚</div>
+        <div id="promoNote3" style="display:none;font-size:11px;color:var(--muted);margin:6px 0;padding:8px;background:var(--gp);border-radius:8px;">⏳ Промо-видео тез илова мешавад!</div>
         <div class="c-foot">
           <div class="c-price">490 сом.</div>
           <a href="https://t.me/Jannat_Abdullaeva_Admin" target="_blank" class="bbuy">Харидан</a>
