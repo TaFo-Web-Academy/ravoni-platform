@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="tg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#2d5a3d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Платформаи РАВОНИ</title>
+<link rel="manifest" href="manifest.json">
+<!-- ✅ Telegram Mini App SDK -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<!-- 🔥 Firebase SDK (Firestore для постов) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green:  #2d5a3d;
+  --gl:     #3d7a54;
+  --gp:     #e8f0eb;
+  --beige:  #c8a882;
+  --bl:     #f5ede0;
+  --bp:     #fdf8f2;
+  --white:  #ffffff;
+  --text:   #1a2e22;
+  --muted:  #7a8c80;
+  --border: #e2ebe4;
+  --shadow: 0 4px 24px rgba(45,90,61,.10);
+  --r:      16px;
+  --nav:    68px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bp); color:var(--text); overflow:hidden; }
+#app { max-width:430px; margin:0 auto; height:100vh; display:flex; flex-direction:column; position:relative; background:var(--bp); overflow:hidden; }
+
+.screen { display:none; flex:1; overflow-y:auto; padding-bottom:calc(var(--nav) + 16px); }
+.screen.active { display:block; }
+.screen::-webkit-scrollbar { width:3px; }
+.screen::-webkit-scrollbar-thumb { background:var(--beige); border-radius:10px; }
+
+@keyframes fadeUp    { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn    { from{opacity:0} to{opacity:1} }
+@keyframes scaleIn   { from{opacity:0;transform:scale(.88)} to{opacity:1;transform:scale(1)} }
+@keyframes typingBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-7px)} }
+@keyframes aiPulse   { 0%,100%{box-shadow:0 0 0 0 rgba(45,90,61,.4)} 60%{box-shadow:0 0 0 14px rgba(45,90,61,0)} }
+@keyframes slideIn   { from{transform:translateX(-100%)} to{transform:translateX(0)} }
+@keyframes slideOut  { from{transform:translateX(0)} to{transform:translateX(-100%)} }
+
+.a1{animation:fadeUp .4s ease both;}
+.a2{animation:fadeUp .4s .09s ease both;}
+.a3{animation:fadeUp .4s .18s ease both;}
+.a4{animation:fadeUp .4s .27s ease both;}
+.a5{animation:fadeUp .4s .36s ease both;}
+.asc{animation:scaleIn .38s cubic-bezier(.34,1.4,.64,1) both;}
+
+/* ── TOPBAR ── */
+.topbar {
+  padding:14px 20px 10px;
+  background:var(--white); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:10; animation:fadeIn .3s ease;
+}
+.topbar-logo { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:600; color:var(--green); }
+.topbar-logo span { color:var(--beige); }
+.topbar-sub { font-size:11px; color:var(--muted); font-weight:300; margin-top:1px; }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+  width:100%; max-width:430px; height:var(--nav);
+  background:var(--white); border-top:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-around;
+  z-index:100; padding-bottom:env(safe-area-inset-bottom);
+}
+.nav-item {
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+  cursor:pointer; padding:8px 2px; transition:all .2s; position:relative;
+}
+.nav-item:active { transform:scale(.91); }
+.nav-icon { font-size:18px; transition:transform .25s cubic-bezier(.34,1.56,.64,1); }
+.nav-label { font-size:9.5px; font-weight:500; color:var(--muted); transition:color .2s; }
+.nav-item.active .nav-label { color:var(--green); font-weight:600; }
+.nav-item.active .nav-icon { transform:scale(1.2); }
+.nav-item.active::before {
+  content:''; position:absolute; top:0; left:50%; transform:translateX(-50%);
+  width:32px; height:3px; background:var(--green); border-radius:0 0 6px 6px;
+}
+
+.sec-t { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:var(--text); }
+.sec-t em { color:var(--green); font-style:italic; }
+
+/* ── HOME ── */
+.home-hero {
+  background:linear-gradient(135deg,var(--green),var(--gl));
+  padding:28px 20px 32px; position:relative; overflow:hidden;
+}
+.home-hero::before { content:''; position:absolute; top:-50px; right:-50px; width:190px; height:190px; border-radius:50%; background:rgba(255,255,255,.06); }
+.home-hero::after  { content:''; position:absolute; bottom:-30px; left:-20px; width:130px; height:130px; border-radius:50%; background:rgba(200,168,130,.11); }
+.hg { font-size:12px; color:rgba(255,255,255,.7); font-weight:300; letter-spacing:.5px; margin-bottom:8px; }
+.ht { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:600; color:#fff; line-height:1.25; margin-bottom:16px; }
+.ht em { color:#e8c99a; font-style:italic; }
+.hb { display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.14); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.2); border-radius:20px; padding:7px 15px; font-size:12px; color:#fff; }
+.hbody { padding:18px 20px 0; }
+.phdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.pcnt { font-size:12px; color:var(--muted); background:var(--gp); padding:4px 11px; border-radius:20px; }
+
+/* ── POST CARDS ── */
+.post-card {
+  background:var(--white); border-radius:var(--r); padding:14px;
+  margin-bottom:12px; box-shadow:var(--shadow); border:1px solid var(--border);
+  transition:transform .2s;
+}
+.post-card:active { transform:scale(.99); }
+.pmeta { display:flex; align-items:center; gap:9px; margin-bottom:10px; }
+/* 📸 Аватар автора — круглое фото */
+.pav {
+  width:36px; height:36px; border-radius:50%; object-fit:cover;
+  border:2px solid var(--border); flex-shrink:0;
+}
+.pav-fallback {
+  width:36px; height:36px; background:linear-gradient(135deg,var(--green),var(--gl));
+  border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;
+}
+.pauth { font-size:13px; font-weight:500; color:var(--text); }
+.pdt   { font-size:11px; color:var(--muted); font-weight:300; }
+/* 📸 Фото поста */
+.pimg-wrap { width:100%; border-radius:10px; margin-bottom:10px; overflow:hidden; aspect-ratio:16/9; }
+.pimg-wrap img { width:100%; height:100%; object-fit:cover; display:block; }
+.pimg-emoji { width:100%; border-radius:10px; margin-bottom:10px; aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; font-size:30px; }
+.ptxt  { font-size:13.5px; line-height:1.65; color:var(--text); margin-bottom:9px; }
+.pviews { font-size:12px; color:var(--muted); }
+
+/* ── COURSES ── */
+.ch { background:linear-gradient(135deg,#1a3d2a,var(--green)); padding:24px 20px; }
+.ch .sec-t { color:#fff; margin-bottom:5px; }
+.ch p { font-size:13px; color:rgba(255,255,255,.65); font-weight:300; }
+.cfilter { display:flex; gap:8px; padding:14px 20px 10px; overflow-x:auto; }
+.cfilter::-webkit-scrollbar { display:none; }
+.fb {
+  flex-shrink:0; padding:8px 20px; border-radius:22px; font-size:13px; font-weight:500;
+  cursor:pointer; border:1.5px solid var(--border); background:var(--white); color:var(--muted);
+  transition:all .2s;
+}
+.fb.active { background:var(--green); color:#fff; border-color:var(--green); }
+.fb:active  { transform:scale(.94); }
+.cl { padding:8px 20px 12px; }
+
+.cc {
+  background:var(--white); border-radius:var(--r); overflow:hidden;
+  margin-bottom:20px; box-shadow:0 6px 32px rgba(45,90,61,.12);
+  border:1px solid var(--border); transition:transform .2s;
+}
+.cc:active { transform:scale(.99); }
+
+/* 📸 Превью видео с реальным превью или градиентом */
+.c-video {
+  width:100%; aspect-ratio:16/9;
+  background:linear-gradient(135deg,var(--green),#1a3d2a);
+  display:flex; align-items:center; justify-content:center;
+  position:relative; cursor:pointer; overflow:hidden;
+}
+.c-video img.c-thumb {
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  filter:brightness(.85);
+}
+.c-video::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(0,0,0,.18),transparent); }
+.c-video-alt1 { background:linear-gradient(135deg,#1a3d2a,#2d5a3d); }
+.c-video-alt2 { background:linear-gradient(135deg,#3d1a2a,#6b2340); }
+.v-play {
+  width:56px; height:56px; background:rgba(255,255,255,.9); border-radius:50%;
+  display:flex; align-items:center; justify-content:center; font-size:24px;
+  box-shadow:0 4px 20px rgba(0,0,0,.25); z-index:2; transition:transform .2s;
+}
+.c-video:active .v-play { transform:scale(.9); }
+.v-dur {
+  position:absolute; bottom:10px; right:12px;
+  background:rgba(0,0,0,.65); color:#fff; font-size:11px;
+  padding:3px 8px; border-radius:6px; z-index:2; font-weight:500;
+}
+.v-bdg {
+  position:absolute; top:10px; left:10px; font-size:10px; font-weight:700;
+  padding:4px 10px; border-radius:6px; z-index:2; letter-spacing:.3px;
+}
+.bf  { background:#4caf50; color:#fff; }
+.bp2 { background:var(--beige); color:#fff; }
+
+.c-body { padding:16px; }
+.c-title { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; color:var(--text); line-height:1.3; margin-bottom:6px; }
+.c-desc  { font-size:13px; color:var(--muted); line-height:1.6; font-weight:300; margin-bottom:14px; }
+.c-foot  { display:flex; align-items:center; justify-content:space-between; padding-top:12px; border-top:1px solid var(--border); }
+.c-price { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:var(--green); }
+.pfree   { color:#4caf50; }
+.bbuy {
+  background:linear-gradient(135deg,var(--green),var(--gl)); color:#fff; border:none;
+  padding:11px 22px; border-radius:24px; font-size:13px; font-weight:600;
+  cursor:pointer; text-decoration:none; display:inline-block;
+  font-family:'DM Sans',sans-serif; transition:transform .18s; letter-spacing:.2px;
+}
+.bbuy:active { transform:scale(.94); }
+.c-tags { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+.ctag { background:var(--gp); color:var(--green); font-size:11px; padding:4px 11px; border-radius:20px; font-weight:500; }
+
+/* ── VIDEO MODAL ── */
+.vid-overlay {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,.88);
+  z-index:999; align-items:center; justify-content:center; flex-direction:column; gap:16px;
+}
+.vid-overlay.open { display:flex; animation:fadeIn .25s ease; }
+.vid-close {
+  width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,.15);
+  border:none; color:#fff; font-size:22px; cursor:pointer; align-self:flex-end;
+  margin-right:16px;
+}
+.vid-frame {
+  width:100%; max-width:420px; aspect-ratio:16/9; border-radius:12px; overflow:hidden;
+}
+.vid-frame iframe { width:100%; height:100%; border:none; }
+
+/* ── EXPERT ── */
+.eh { background:var(--bl); padding:28px 20px 20px; text-align:center; border-bottom:1px solid var(--border); }
+/* 📸 Фото эксперта — реальное */
+.eph {
+  width:100px; height:100px; border-radius:50%; margin:0 auto 14px;
+  overflow:hidden; box-shadow:0 8px 30px rgba(200,168,130,.4);
+  border:4px solid var(--white); display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg,var(--beige),#d4b896);
+}
+.eph img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+.en  { font-family:'Cormorant Garamond',serif; font-size:23px; font-weight:600; color:var(--text); margin-bottom:4px; }
+.es  { font-size:12px; color:var(--muted); font-weight:300; margin-bottom:16px; }
+.estats { display:flex; justify-content:center; gap:28px; }
+.sn { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:var(--green); display:block; }
+.sl { font-size:11px; color:var(--muted); font-weight:300; }
+.ebody { padding:18px; }
+.esec { background:var(--white); border-radius:var(--r); padding:15px; margin-bottom:11px; border:1px solid var(--border); }
+.est  { font-size:11px; font-weight:600; color:var(--green); text-transform:uppercase; letter-spacing:.8px; margin-bottom:10px; }
+.ebio { font-size:13.5px; line-height:1.75; color:var(--text); font-weight:300; }
+.ach  { display:flex; align-items:flex-start; gap:10px; padding:6px 0; font-size:13px; color:var(--text); font-weight:300; line-height:1.5; }
+.achi { width:28px; height:28px; background:var(--gp); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+.bconsult {
+  width:100%; background:linear-gradient(135deg,var(--green),var(--gl)); color:#fff; border:none;
+  padding:15px; border-radius:var(--r); font-size:14px; font-weight:600; cursor:pointer;
+  text-decoration:none; display:block; text-align:center;
+  font-family:'DM Sans',sans-serif; transition:transform .18s; letter-spacing:.3px;
+}
+.bconsult:active { transform:scale(.98); }
+.cnote { font-size:11px; color:var(--muted); text-align:center; margin-top:8px; font-weight:300; }
+
+/* ═══════════════════════════════════════════
+   AI CHAT — Обновлённый дизайн с тулбаром
+   ═══════════════════════════════════════════ */
+#screen-ai { display:none; flex-direction:column; height:100%; padding-bottom:var(--nav); }
+#screen-ai.active { display:flex; }
+
+.ai-top {
+  background:linear-gradient(135deg,var(--green),var(--gl));
+  padding:14px 16px 12px;
+  display:flex; align-items:center; gap:11px; flex-shrink:0;
+}
+.ai-top-av {
+  width:44px; height:44px; background:rgba(255,255,255,.2);
+  border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:16px; font-weight:800; color:#fff; font-family:'DM Sans',sans-serif;
+  border:2px solid rgba(255,255,255,.35); letter-spacing:-1px;
+  animation:aiPulse 2.8s infinite; flex-shrink:0;
+}
+.ai-top-info { flex:1; min-width:0; }
+.ai-top-name { font-size:15px; font-weight:600; color:#fff; font-family:'Cormorant Garamond',serif; }
+.ai-top-sub  { font-size:11px; color:rgba(255,255,255,.7); display:flex; align-items:center; gap:5px; margin-top:2px; }
+.ai-status-dot { width:7px; height:7px; background:#4caf50; border-radius:50%; display:inline-block; flex-shrink:0; }
+
+/* Тулбар кнопки (история, новый чат, переподключить) */
+.ai-toolbar { display:flex; gap:6px; flex-shrink:0; }
+.ai-tb-btn {
+  width:34px; height:34px; border-radius:50%;
+  background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25);
+  color:#fff; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:all .2s; flex-shrink:0;
+}
+.ai-tb-btn:active { background:rgba(255,255,255,.3); transform:scale(.9); }
+
+/* Индикатор текущей модели */
+.model-badge {
+  font-size:10px; background:rgba(255,255,255,.2); color:rgba(255,255,255,.9);
+  padding:2px 8px; border-radius:10px; font-weight:600; letter-spacing:.3px;
+}
+
+/* ── История чатов — боковая панель ── */
+.hist-panel {
+  position:absolute; top:0; left:0; right:0; bottom:0;
+  background:var(--white); z-index:50; display:flex; flex-direction:column;
+  transform:translateX(-100%); transition:transform .3s cubic-bezier(.34,1.1,.64,1);
+  padding-bottom:var(--nav);
+}
+.hist-panel.open { transform:translateX(0); }
+.hist-head {
+  background:linear-gradient(135deg,var(--green),var(--gl));
+  padding:16px 18px; display:flex; align-items:center; justify-content:space-between;
+}
+.hist-head-t { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:600; color:#fff; }
+.hist-close {
+  width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,.2);
+  border:none; color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+}
+.hist-list { flex:1; overflow-y:auto; padding:12px; }
+.hist-item {
+  padding:12px 14px; border-radius:12px; border:1px solid var(--border);
+  margin-bottom:8px; cursor:pointer; transition:all .2s; background:var(--bp);
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+}
+.hist-item:active { background:var(--gp); transform:scale(.98); }
+.hist-item-t { font-size:13px; font-weight:500; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; }
+.hist-item-d { font-size:11px; color:var(--muted); flex-shrink:0; }
+.hist-del { font-size:16px; color:var(--muted); cursor:pointer; flex-shrink:0; padding:2px; }
+.hist-del:hover { color:#e74c3c; }
+.hist-empty { text-align:center; padding:40px 20px; color:var(--muted); font-size:13px; }
+
+/* ── Сообщения ── */
+.ai-msgs {
+  flex:1; overflow-y:auto; padding:16px;
+  display:flex; flex-direction:column; gap:12px;
+  background:var(--bp);
+}
+.ai-msgs::-webkit-scrollbar { width:3px; }
+.ai-msgs::-webkit-scrollbar-thumb { background:var(--beige); border-radius:10px; }
+
+.msg { display:flex; gap:9px; max-width:88%; animation:fadeUp .3s ease; }
+.msg.user { align-self:flex-end; flex-direction:row-reverse; }
+.msg-av {
+  width:30px; height:30px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:800; flex-shrink:0; margin-top:2px;
+  font-family:'DM Sans',sans-serif; letter-spacing:-.5px;
+}
+.msg.ai   .msg-av { background:var(--gp); color:var(--green); }
+.msg.user .msg-av { background:var(--bl); color:var(--beige); }
+.msg-bbl { padding:11px 14px; border-radius:14px; font-size:13.5px; line-height:1.6; }
+.msg.ai   .msg-bbl { background:var(--white); color:var(--text); border-radius:4px 14px 14px 14px; box-shadow:var(--shadow); }
+.msg.user .msg-bbl { background:var(--green); color:#fff; border-radius:14px 4px 14px 14px; }
+.msg-t { font-size:10px; color:var(--muted); margin-top:3px; text-align:right; }
+
+/* 🔗 Кликабельные ссылки в AI сообщениях */
+.msg-bbl a { color:var(--green); font-weight:600; text-decoration:underline; }
+.msg.user .msg-bbl a { color:#a8dfba; }
+
+/* Уведомление о переключении модели */
+.model-switch-msg {
+  background:#fff8e1; border:1px solid #ffe082; border-radius:10px;
+  padding:10px 14px; font-size:12px; color:#856404; text-align:center;
+  margin:4px 0; animation:fadeIn .4s ease;
+}
+
+/* Typing */
+.typing { display:flex; gap:5px; align-items:center; padding:12px 15px; background:var(--white); border-radius:4px 14px 14px 14px; width:fit-content; box-shadow:var(--shadow); }
+.tdot  { width:8px; height:8px; background:var(--green); border-radius:50%; animation:typingBounce 1.2s infinite; }
+.tdot:nth-child(2) { animation-delay:.2s; }
+.tdot:nth-child(3) { animation-delay:.4s; }
+
+/* Быстрые вопросы */
+.quick-btns { display:flex; gap:8px; flex-wrap:wrap; padding:0 16px 12px; }
+.qbtn {
+  background:var(--white); border:1.5px solid var(--border); border-radius:20px;
+  padding:7px 14px; font-size:12px; color:var(--green); font-weight:500;
+  cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif;
+}
+.qbtn:active { background:var(--gp); transform:scale(.95); }
+
+/* Поле ввода */
+.ai-inp-row {
+  display:flex; gap:9px; padding:12px 16px;
+  border-top:1px solid var(--border); flex-shrink:0; background:var(--white);
+}
+.ai-inp {
+  flex:1; padding:12px 16px; border:1.5px solid var(--border); border-radius:30px;
+  font-size:13px; font-family:'DM Sans',sans-serif; color:var(--text);
+  outline:none; background:var(--bp); transition:border-color .2s;
+}
+.ai-inp:focus { border-color:var(--green); }
+.ai-char-count { font-size:10px; color:var(--muted); align-self:center; flex-shrink:0; min-width:36px; text-align:right; }
+.ai-send {
+  width:44px; height:44px; background:linear-gradient(135deg,var(--green),var(--gl));
+  border:none; border-radius:50%; color:#fff; font-size:16px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; transition:transform .18s; flex-shrink:0;
+}
+.ai-send:active { transform:scale(.88); }
+
+/* ── AI LIMIT BANNER — Блокировка при 15 сообщениях ── */
+.ai-limit-wrap {
+  display:none; flex-shrink:0;
+  flex-direction:column; align-items:center;
+  padding:20px 20px 14px; border-top:1px solid var(--border);
+  background:var(--white); gap:8px;
+}
+.ai-limit-wrap.show { display:flex; }
+.ai-limit-icon { font-size:32px; animation:scaleIn .4s cubic-bezier(.34,1.4,.64,1) both; }
+.ai-limit-title { font-size:14px; font-weight:600; color:var(--text); text-align:center; }
+.ai-limit-sub { font-size:12px; color:var(--muted); text-align:center; font-weight:300; }
+.ai-limit-timer {
+  background:linear-gradient(135deg,var(--green),var(--gl));
+  color:#fff; border-radius:12px; padding:8px 24px;
+  font-size:18px; font-weight:700; font-family:'Cormorant Garamond',serif;
+  letter-spacing:2px; margin-top:4px;
+}
+.ai-limit-note { font-size:11px; color:var(--muted); text-align:center; }
+
+/* Счётчик сообщений в тулбаре */
+.ai-msg-counter {
+  font-size:10px; color:rgba(255,255,255,.6); background:rgba(255,255,255,.1);
+  padding:2px 7px; border-radius:10px; font-weight:500;
+}
+.ai-msg-counter.warn { color:#ffd54f; background:rgba(255,213,79,.15); }
+.ai-msg-counter.danger { color:#ff8a65; background:rgba(255,138,101,.15); }
+.prof-hero { background:linear-gradient(135deg,var(--green),var(--gl)); padding:28px 20px 24px; text-align:center; position:relative; overflow:hidden; }
+.prof-hero::before { content:''; position:absolute; top:-30px; right:-30px; width:130px; height:130px; border-radius:50%; background:rgba(255,255,255,.06); }
+.prof-av   { width:76px; height:76px; border-radius:50%; background:rgba(255,255,255,.2); border:3px solid rgba(255,255,255,.35); margin:0 auto 11px; display:flex; align-items:center; justify-content:center; font-size:32px; }
+.prof-name { font-family:'Cormorant Garamond',serif; font-size:21px; font-weight:600; color:#fff; margin-bottom:3px; }
+.prof-id   { font-size:12px; color:rgba(255,255,255,.6); font-weight:300; }
+.pbody     { padding:18px; }
+.icard     { background:var(--white); border-radius:var(--r); padding:15px; margin-bottom:12px; border:1px solid var(--border); box-shadow:var(--shadow); }
+.ict  { font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.8px; margin-bottom:12px; }
+.irow { display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); }
+.irow:last-child { border-bottom:none; padding-bottom:0; }
+.ik { font-size:13px; color:var(--muted); font-weight:300; }
+.iv { font-size:13px; color:var(--text); font-weight:600; }
+.rcard { background:var(--white); border-radius:var(--r); padding:15px; margin-bottom:12px; border:1px solid var(--border); box-shadow:var(--shadow); }
+.rct    { font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.8px; margin-bottom:13px; }
+.rdisp  { display:flex; align-items:center; gap:13px; }
+.rcirc  { width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; background:#fff8e1; }
+.rlevel { font-size:14px; font-weight:600; color:var(--text); margin-bottom:3px; }
+.rscore { font-size:12px; color:var(--muted); font-weight:300; }
+.rbar   { margin-top:12px; height:6px; background:var(--gp); border-radius:10px; overflow:hidden; }
+.rfill  { height:100%; border-radius:10px; background:linear-gradient(90deg,var(--green),var(--beige)); transition:width 1.2s cubic-bezier(.34,1.2,.64,1); }
+.pwa-card { background:linear-gradient(135deg,var(--green),var(--gl)); border-radius:var(--r); padding:15px 17px; margin-bottom:12px; display:flex; align-items:center; gap:13px; cursor:pointer; transition:transform .18s; box-shadow:0 6px 24px rgba(45,90,61,.3); }
+.pwa-card:active { transform:scale(.97); }
+.pwai { width:48px; height:48px; background:rgba(255,255,255,.16); border-radius:13px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+.pwat { font-size:14px; font-weight:600; color:#fff; margin-bottom:3px; }
+.pwas { font-size:11px; color:rgba(255,255,255,.7); font-weight:300; }
+.pwaa { margin-left:auto; color:rgba(255,255,255,.6); font-size:24px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ════════════ HOME ════════════ -->
+<div id="screen-home" class="screen active">
+  <div class="topbar">
+    <div>
+      <div class="topbar-logo">Платформаи <span>РАВОНИ</span></div>
+      <div class="topbar-sub">Шифои равонӣ</div>
+    </div>
+    <div style="font-size:22px">🌿</div>
+  </div>
+  <div class="home-hero">
+    <div class="hg a1">Хуш омадед 👋</div>
+    <div class="ht a2">Кӯдаки <em>дарун</em>атро шифо деҳ</div>
+    <div class="hb a3">🌱 Бо Чаннат Абдулоева</div>
+  </div>
+  <div class="hbody">
+    <div class="phdr a4">
+      <div class="sec-t" style="font-size:20px">Охирин <em>навишта</em>ҳо</div>
+      <div class="pcnt">5 пост</div>
+    </div>
+
+    <!-- 📰 ПОСТЫ — грузятся из Firebase или статично -->
+    <div id="postsList">
+      <div style="text-align:center;padding:30px;color:var(--muted);font-size:13px">Бор мешавад... 🌿</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ COURSES ════════════ -->
+<div id="screen-courses" class="screen">
+  <div class="ch"><div class="sec-t a1">Курс<em>ҳо</em></div><p class="a2">Барномаҳои шифои равонӣ</p></div>
+  <div class="cfilter">
+    <div class="fb active" onclick="filterC(this,'all')">Ҳама</div>
+    <div class="fb" onclick="filterC(this,'free')">Ройгон</div>
+    <div class="fb" onclick="filterC(this,'paid')">Пулакӣ</div>
+  </div>
+  <div class="cl">
+
+    <!-- Курс 1 — Ройгон -->
+    <div class="cc a1" data-type="free">
+      <div class="c-video" onclick="playVideo('YOUTUBE_ID_1','Кӯдаки дарун чист?')">
+        <!-- 📸 ПРЕВЬЮ ВИДЕО 1: замените src на реальный thumbnail из Cloudinary/YouTube -->
+        <img class="c-thumb" src="https://images.unsplash.com/photo-1476234251651-f353703a034d?w=400&h=225&fit=crop" alt="Курс 1" loading="lazy">
+        <span class="v-bdg bf">РОЙГОН</span>
+        <div class="v-play">▶️</div>
+        <span class="v-dur">7:24</span>
+      </div>
+      <div class="c-body">
+        <div class="c-tags"><span class="ctag">Мафҳум</span><span class="ctag">3 аломат</span><span class="ctag">Қадами аввал</span></div>
+        <div class="c-title">Кӯдаки дарун чист?</div>
+        <div class="c-desc">Дарси муқаддимавии ройгон. Фаҳмед, ки кӯдаки дарун чист ва чаро ин барои зиндагии шумо муҳим аст.</div>
+        <div class="c-foot">
+          <div class="c-price pfree">Ройгон</div>
+          <a href="https://t.me/Jannat_Abdullaeva_Admin" target="_blank" class="bbuy">Тамошо кунед</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Курс 2 — Пулакӣ -->
+    <div class="cc a2" data-type="paid">
+      <div class="c-video c-video-alt1" onclick="playVideo('YOUTUBE_ID_2','Шифои Асосӣ')">
+        <!-- 📸 ПРЕВЬЮ ВИДЕО 2 -->
+        <img class="c-thumb" src="https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=400&h=225&fit=crop" alt="Курс 2" loading="lazy">
+        <span class="v-bdg bp2">ПУЛАКӢ</span>
+        <div class="v-play">▶️</div>
+        <span class="v-dur">12:50</span>
+      </div>
+      <div class="c-body">
+        <div class="c-tags"><span class="ctag">20+ дарс</span><span class="ctag">Машқ</span><span class="ctag">Гувоҳнома</span></div>
+        <div class="c-title">Шифои Асосӣ — 4 ҳафта</div>
+        <div class="c-desc">Барномаи 4-ҳафтаина барои шифои захмҳои кӯдакӣ. Дарсҳои видеоӣ, машқҳои амалӣ ва дастгирии гурӯҳӣ.</div>
+        <div class="c-foot">
+          <div class="c-price">350 сом.</div>
+          <a href="https://t.me/Jannat_Abdullaeva_Admin" target="_blank" class="bbuy">Харидан</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Курс 3 — Пулакӣ -->
+    <div class="cc a3" data-type="paid">
+      <div class="c-video c-video-alt2" onclick="playVideo('YOUTUBE_ID_3','Муносибатҳои солим')">
+        <!-- 📸 ПРЕВЬЮ ВИДЕО 3 -->
+        <img class="c-thumb" src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=225&fit=crop" alt="Курс 3" loading="lazy">
+        <span class="v-bdg bp2">ПУЛАКӢ</span>
+        <div class="v-play">▶️</div>
+        <span class="v-dur">15:10</span>
+      </div>
+      <div class="c-body">
+        <div class="c-tags"><span class="ctag">Психология</span><span class="ctag">Ҳудудгузорӣ</span><span class="ctag">Машқ</span></div>
+        <div class="c-title">Муносибатҳои солим</div>
+        <div class="c-desc">Чӣ тавр муносибатҳои солим созед ва аз намунаҳои нодурусти гузашта раҳо шавед.</div>
+        <div class="c-foot">
+          <div class="c-price">490 сом.</div>
+          <a href="https://t.me/Jannat_Abdullaeva_Admin" target="_blank" class="bbuy">Харидан</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════ VIDEO MODAL ════════════ -->
+<div class="vid-overlay" id="vidOverlay" onclick="closeVideo(event)">
+  <button class="vid-close" onclick="closeVideo()">✕</button>
+  <div class="vid-frame">
+    <!--
+      🎬 КАК ПОДКЛЮЧИТЬ РЕАЛЬНОЕ ВИДЕО:
+      Вариант А (YouTube):
+        <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID?autoplay=1" allowfullscreen allow="autoplay"></iframe>
+      Вариант Б (Cloudinary):
+        <video src="https://res.cloudinary.com/YOUR_CLOUD/video/upload/YOUR_VIDEO.mp4" controls autoplay></video>
+    -->
+    <iframe id="vidFrame" src="" allowfullscreen allow="autoplay; fullscreen"></iframe>
+  </div>
+  <div id="vidTitle" style="color:rgba(255,255,255,.7);font-size:13px;margin-top:8px;font-family:'DM Sans',sans-serif;"></div>
+</div>
+
+<!-- ════════════ EXPERT ════════════ -->
+<div id="screen-expert" class="screen">
+  <div class="eh">
+    <!-- 📸 ФОТО ЭКСПЕРТА: замените src на реальное фото Чаннат из Cloudinary -->
+    <div class="eph asc">
+      <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop&crop=face" alt="Чаннат Абдулоева" onerror="this.parentElement.innerHTML='👩‍⚕️';this.parentElement.style.fontSize='40px'">
+    </div>
+    <div class="en a1">Чаннат Абдулоева</div>
+    <div class="es a2">Равоншинос • Мураббии шахсӣ</div>
+    <div class="estats a3">
+      <div><span class="sn">5+</span><span class="sl">Солҳо</span></div>
+      <div><span class="sn">500+</span><span class="sl">Муштариён</span></div>
+      <div><span class="sn">3</span><span class="sl">Курсҳо</span></div>
+    </div>
+  </div>
+  <div class="ebody">
+    <div class="esec a1">
+      <div class="est">Дар бораи ман</div>
+      <div class="ebio">Ман Чаннат Абдулоева — равоншинос ва мураббии шахсии сертификатнок ҳастам. Зиёда аз 5 сол бо одамоне кор мекунам, ки мехоҳанд захмҳои кӯдакиро шифо диҳанд ва зиндагии хушбахттарро бисозанд.</div>
+    </div>
+    <div class="esec a2">
+      <div class="est">Дастовардҳо</div>
+      <div class="ach"><div class="achi">🎓</div>Магистри равоншиносии клиникӣ</div>
+      <div class="ach"><div class="achi">📜</div>Сертификати терапияи когнитивӣ-рафторӣ</div>
+      <div class="ach"><div class="achi">🌍</div>Узви Ассотсиатсияи равоншиносон</div>
+      <div class="ach"><div class="achi">📺</div>Мехмони барномаҳои телевизионӣ</div>
+    </div>
+    <a href="https://t.me/Jannat_Abdullaeva_Admin" target="_blank" class="bconsult a3">💬 Консултатсия гиред</a>
+    <div class="cnote a4">💡 Нарх ва шартҳоро бевосита аз равоншинос пурсед</div>
+  </div>
+</div>
+
+<!-- ════════════ AI ЁРДАМЧИ ════════════ -->
+<div id="screen-ai" class="screen">
+
+  <!-- История чатов (панель) -->
+  <div class="hist-panel" id="histPanel">
+    <div class="hist-head">
+      <span class="hist-head-t">📋 История чатов</span>
+      <button class="hist-close" onclick="closeHistory()">✕</button>
+    </div>
+    <div class="hist-list" id="histList">
+      <div class="hist-empty">Чати сабт нашудааст 🕊️</div>
+    </div>
+    <!-- Кнопка очистить всё -->
+    <div style="padding:12px 16px;border-top:1px solid var(--border);">
+      <button onclick="clearAllHistory()" style="width:100%;padding:11px;border-radius:10px;border:1.5px solid #fecaca;background:#fff5f5;color:#c0392b;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;">🗑️ Ҳамаи таърихро тоза кунед</button>
+    </div>
+  </div>
+
+  <!-- Шапка AI чата -->
+  <div class="ai-top">
+    <div class="ai-top-av" id="aiAvatar">AI</div>
+    <div class="ai-top-info">
+      <div class="ai-top-name">AI Ёрдамчи</div>
+      <div class="ai-top-sub">
+        <span class="ai-status-dot" id="aiStatusDot"></span>
+        <span id="aiModelLabel">Модел 1 — Llama</span>
+        &nbsp;<span class="model-badge" id="modelBadge">M1</span>
+      </div>
+    </div>
+    <!-- 🔧 ТУЛБАР: История / Новый чат / Переподключить -->
+    <div class="ai-toolbar">
+      <span class="ai-msg-counter" id="aiMsgCounter">0/15</span>
+      <button class="ai-tb-btn" onclick="showHistory()" title="История">🕐</button>
+      <button class="ai-tb-btn" onclick="newChat()" title="Новый чат">✏️</button>
+      <button class="ai-tb-btn" onclick="reconnectModel()" title="Переподключить модел">🔄</button>
+    </div>
+  </div>
+
+  <!-- Сообщения -->
+  <div class="ai-msgs" id="aiMsgs">
+    <div class="msg ai">
+      <div class="msg-av">AI</div>
+      <div>
+        <div class="msg-bbl">Салом! 👋 Ман AI ёрдамчии Платформаи РАВОНИ ҳастам 🌿<br><br>Дар бораи курсҳо, тест ва платформа ба ман савол диҳед!</div>
+        <div class="msg-t">Ҳозир</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Быстрые вопросы -->
+  <div class="quick-btns" id="quickBtns">
+    <div class="qbtn" onclick="quickAsk('Курсҳо чанд нарх доранд?')">💰 Нарх</div>
+    <div class="qbtn" onclick="quickAsk('Тест чӣ гуна аст?')">🧪 Тест</div>
+    <div class="qbtn" onclick="quickAsk('Ба менеҷер чӣ тавр мурољиат кунам?')">📞 Менеҷер</div>
+    <div class="qbtn" onclick="quickAsk('Курс чӣ медиҳад?')">📚 Курс</div>
+  </div>
+
+  <!-- 🚫 Лимит баннер (показывается после 15 сообщений) -->
+  <div class="ai-limit-wrap" id="aiLimitWrap">
+    <div class="ai-limit-icon">⏰</div>
+    <div class="ai-limit-title">Лимити рӯзонаи шумо тамом шуд!</div>
+    <div class="ai-limit-sub">Фардо соати <strong id="limitResetTime">00:00</strong> шумо метавонед боз нависед</div>
+    <div class="ai-limit-timer" id="limitCountdown">00:00:00</div>
+    <div class="ai-limit-note">Ҳар рӯз 15 паём — ройгон 🌿</div>
+  </div>
+
+  <!-- Поле ввода -->
+  <div class="ai-inp-row" id="aiInputRow">
+    <input class="ai-inp" id="aiInp" maxlength="1000" placeholder="Паёми худро нависед..." 
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}">
+    <button class="ai-send" onclick="sendMsg()">➤</button>
+  </div>
+</div>
+
+<!-- ════════════ PROFILE ════════════ -->
+<div id="screen-profile" class="screen">
+  <div class="prof-hero">
+    <div class="prof-av asc" id="profAv">👤</div>
+    <div class="prof-name a1" id="profName">@username</div>
+    <div class="prof-id a2" id="profId">ID: —</div>
+  </div>
+  <div class="pbody">
+    <!-- PWA / Add to Home Screen -->
+    <div class="pwa-card a1" onclick="installPWA()" id="pwaCard">
+      <div class="pwai" id="pwaIcon">📲</div>
+      <div>
+        <div class="pwat" id="pwaTitle">Илова ба экрани асосӣ</div>
+        <div class="pwas" id="pwaSub">Барномаро насб кунед — ройгон!</div>
+      </div>
+      <div class="pwaa">›</div>
+    </div>
+    <!-- Бот ссылка -->
+    <a href="https://t.me/kudaki_darun_bot" target="_blank" style="display:block;text-decoration:none;margin-bottom:12px;">
+      <div style="background:var(--white);border-radius:var(--r);padding:14px 17px;border:1px solid var(--border);box-shadow:var(--shadow);display:flex;align-items:center;gap:13px;" class="a2">
+        <div style="width:44px;height:44px;background:var(--gp);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🤖</div>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px">Тестро гузаред</div>
+          <div style="font-size:12px;color:var(--muted);font-weight:300">@kudaki_darun_bot — ройгон!</div>
+        </div>
+        <div style="margin-left:auto;color:var(--muted);font-size:20px">›</div>
+      </div>
+    </a>
+    <div class="icard a2">
+      <div class="ict">Маълумот</div>
+      <div class="irow"><span class="ik">Ном</span><span class="iv" id="cardName">—</span></div>
+      <div class="irow"><span class="ik">Telegram ID</span><span class="iv" id="cardId">—</span></div>
+      <div class="irow"><span class="ik">Сана</span><span class="iv">7 март 2026</span></div>
+    </div>
+    <div class="rcard a3">
+      <div class="rct">Натиҷаи тест</div>
+      <div class="rdisp">
+        <div class="rcirc">🟡</div>
+        <div><div class="rlevel">Кӯдаки дарун — захм дорад</div><div class="rscore">Хол: 11 аз 20</div></div>
+      </div>
+      <div class="rbar"><div class="rfill" id="rFill" style="width:0%"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ BOTTOM NAV ════════════ -->
+<nav class="bottom-nav">
+  <div class="nav-item active" onclick="showTab('home',this)">
+    <div class="nav-icon">🏠</div>
+    <div class="nav-label">Асосӣ</div>
+  </div>
+  <div class="nav-item" onclick="showTab('courses',this)">
+    <div class="nav-icon">📚</div>
+    <div class="nav-label">Курсҳо</div>
+  </div>
+  <div class="nav-item" onclick="showTab('expert',this)">
+    <div class="nav-icon">👩‍⚕️</div>
+    <div class="nav-label">Эксперт</div>
+  </div>
+  <div class="nav-item" onclick="showTab('ai',this)">
+    <div class="nav-icon">🤖</div>
+    <div class="nav-label">AI</div>
+  </div>
+  <div class="nav-item" onclick="showTab('profile',this)">
+    <div class="nav-icon">👤</div>
+    <div class="nav-label">Профил</div>
+  </div>
+</nav>
+
+</div><!-- #app -->
+
+<script>
+/* ═══════════════════════════════════
+   TAB NAVIGATION
+   ═══════════════════════════════════ */
+function showTab(name, el) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  el.classList.add('active');
+  const sc = document.getElementById('screen-' + name);
+  if (sc) sc.scrollTop = 0;
+  if (name === 'profile') {
+    setTimeout(() => { const f = document.getElementById('rFill'); if (f) f.style.width = '55%'; }, 250);
+  }
+  if (name === 'ai') {
+    setTimeout(() => document.getElementById('aiInp').focus(), 300);
+  }
+}
+
+/* ═══════════════════════════════════
+   COURSE FILTER
+   ═══════════════════════════════════ */
+function filterC(btn, type) {
+  document.querySelectorAll('.fb').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.cc').forEach(c => {
+    c.style.display = (type === 'all' || c.dataset.type === type) ? 'block' : 'none';
+  });
+}
+
+/* ═══════════════════════════════════
+   VIDEO PLAYER
+   ═══════════════════════════════════ */
+function playVideo(videoId, title) {
+  const overlay = document.getElementById('vidOverlay');
+  const frame   = document.getElementById('vidFrame');
+  const titleEl = document.getElementById('vidTitle');
+
+  /*
+    🎬 КАК ПОДКЛЮЧИТЬ ВИДЕО:
+    ─ YouTube: videoId = 'dQw4w9WgXcQ' → автоматически открывается
+    ─ Cloudinary: используй <video> тег вместо iframe в #vidFrame
+    ─ Замените YOUTUBE_ID_1, YOUTUBE_ID_2, YOUTUBE_ID_3 на реальные ID
+  */
+  if (videoId.startsWith('YOUTUBE_ID')) {
+    // Видео ещё не добавлено — просто закрываем оверлей
+    overlay.classList.remove('open');
+    return;
+  } else {
+    frame.style.display = 'block';
+    frame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+    titleEl.textContent = title;
+    titleEl.style.fontSize = '13px';
+    titleEl.style.color = 'rgba(255,255,255,.7)';
+  }
+  overlay.classList.add('open');
+}
+
+function closeVideo(e) {
+  if (e && e.target !== document.getElementById('vidOverlay') && !e.target.classList.contains('vid-close')) return;
+  const overlay = document.getElementById('vidOverlay');
+  const frame   = document.getElementById('vidFrame');
+  overlay.classList.remove('open');
+  frame.src = '';
+}
+
+/* ═══════════════════════════════════════════════════════
+   🔥 FIREBASE CONFIG
+   ═══════════════════════════════════════════════════════
+   КАК ПОЛУЧИТЬ СВОЙ CONFIG:
+   1. console.firebase.google.com → ravoni-platform
+   2. ⚙️ Project Settings (шестерёнка) → Your apps
+   3. Если нет Web App → нажмите "</>" → имя "ravoni-web"
+   4. Скопируйте firebaseConfig → вставьте сюда ↓
+   ═══════════════════════════════════════════════════════ */
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyDu5C0mCR9p4YrpO2YzAz_28V5r-gJrYDk",
+  authDomain:        "ravoni-platform.firebaseapp.com",
+  projectId:         "ravoni-platform",
+  storageBucket:     "ravoni-platform.firebasestorage.app",
+  messagingSenderId: "460268515966",
+  appId:             "1:460268515966:web:9f6febb0c3fc1a7aacde2f",
+  measurementId:     "G-85ESVLEVPB"
+};
+
+// Статичные посты (пока Firebase не подключён — замените потом)
+const STATIC_POSTS = [
+  { author:'Чаннат Абдулоева', date:'6 март 2026 • 14:30', img:'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=400&h=225&fit=crop', text:'Кӯдаки дарун ин қисмати мост, ки ҳанӯз ба муҳаббат ва ғамхорӣ ниёз дорад. Вақте мо ба он эътибор медиҳем, тамоми зиндагиамон тағйир меёбад...', views:247 },
+  { author:'Чаннат Абдулоева', date:'4 март 2026 • 10:15', img:null, text:'3 аломате, ки кӯдаки дарунатон захм дорад:\n1️⃣ Аз танқид зуд ранҷидан\n2️⃣ Худро ҳамеша гунаҳкор ҳис кардан\n3️⃣ «Не» гуфтан мушкил будан.', views:189 },
+  { author:'Чаннат Абдулоева', date:'2 март 2026 • 09:00', img:'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=400&h=225&fit=crop', text:'Муҳаббат ба худ — ин худхоҳӣ нест. Ин шарти асосии саломатии равонӣ аст. Имрӯз як коре кунед, ки барои худатон хуш бошад 💛', views:312 },
+  { author:'Чаннат Абдулоева', date:'28 феврал 2026 • 18:45', img:null, text:'Агар дар муносибатҳо ҳамеша шумо аввал узр мепурсед — ин аломати зарб дидани кӯдаки дарун аст 🌿', views:156 },
+  { author:'Чаннат Абдулоева', date:'25 феврал 2026 • 12:00', img:'https://images.unsplash.com/photo-1477332552946-cfb384aeaf1c?w=400&h=225&fit=crop', text:'Тест гузаштед? 🧪 Натиҷаатонро бо дӯстон мубодила кунед 💙', views:203 }
+];
+
+// Инициализация Firebase
+let db = null;
+try {
+  if (FIREBASE_CONFIG.apiKey !== 'REPLACE_API_KEY') {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+    console.log('✅ Firebase подключён');
+  }
+} catch(e) { console.log('Firebase:', e.message); }
+
+// Рендер одного поста
+const AUTHOR_PHOTO = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=72&h=72&fit=crop&crop=face';
+function renderPost(p) {
+  const imgHtml = p.img ? `<div class="pimg-wrap"><img src="${p.img}" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></div>` : '';
+  return `<div class="post-card a1">
+    <div class="pmeta">
+      <img class="pav" src="${AUTHOR_PHOTO}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="pav-fallback" style="display:none">👩‍⚕️</div>
+      <div><div class="pauth">${p.author||'Чаннат Абдулоева'}</div><div class="pdt">${p.date||''}</div></div>
+    </div>${imgHtml}
+    <div class="ptxt">${(p.text||'').replace(/\n/g,'<br>')}</div>
+    <div class="pviews">👁 ${p.views||0} бинанда</div>
+  </div>`;
+}
+
+// Загрузка постов
+async function loadPosts() {
+  const c = document.getElementById('postsList');
+  if (!c) return;
+  if (db) {
+    try {
+      c.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:13px">Бор мешавад...</div>';
+      const snap = await db.collection('posts').orderBy('createdAt','desc').limit(5).get();
+      c.innerHTML = snap.empty
+        ? STATIC_POSTS.map(renderPost).join('')
+        : snap.docs.map(d => renderPost({id:d.id,...d.data()})).join('');
+    } catch(e) { c.innerHTML = STATIC_POSTS.map(renderPost).join(''); }
+  } else {
+    c.innerHTML = STATIC_POSTS.map(renderPost).join('');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   AI CHAT — GROQ API
+   ═══════════════════════════════════════════════════════ */
+const GROQ_API_KEY = "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";
+
+const AI_MODELS = [
+  { id: 'llama-3.3-70b-versatile', label: 'Модел 1 — Llama', badge: 'M1' },
+  { id: 'gemma2-9b-it',            label: 'Модел 2 — Gemma', badge: 'M2' }
+];
+const MAX_RESPONSE_CHARS = 500;
+const DAILY_MSG_LIMIT    = 15;
+
+const SYSTEM_PROMPT = `Ты AI-ассистент психологической платформы "РАВОНИ" (Таджикистан).
+
+СТРОГИЕ ПРАВИЛА:
+- Отвечай ТОЛЬКО на таджикском языке (Тоҷикӣ)
+- Будь тёплым, поддерживающим, профессиональным
+- ВАЖНО: Ответ НЕ БОЛЕЕ 500 символов — кратко!
+- Эмодзи — умеренно 🌿
+- ⛔ НЕ добавляй ссылки к каждому ответу!
+  Ссылки давай ТОЛЬКО если пользователь ПРЯМО спрашивает о покупке, консультации или технической ошибке.
+
+О ПЛАТФОРМЕ:
+- Психолог: Чаннат Абдулоева (5+ лет, 500+ клиентов)
+- Бот: https://t.me/kudaki_darun_bot — тест «Оё кӯдаки даруни ту ҳанӯз захм дорад?»
+- Курсы: «Кӯдаки дарун чист?» (ройгон), «Шифои Асосӣ» (350 сом), «Муносибатҳои солим» (490 сом)
+
+КОНТАКТЫ — только по запросу:
+- Харидан / консулатсия → https://t.me/Jannat_Abdullaeva_Admin
+- Хатои техникӣ → https://t.me/Mustafo_IT
+- Тест → https://t.me/kudaki_darun_bot`;
+
+// ─── СОСТОЯНИЕ ────────────────────────────────────────
+let currentModelIdx  = 0;
+let chatHistory      = [];
+let currentSessionId = null;
+
+/* ═══════════════════════════════════════════════════════
+   📊 ЛИМИТ — 15 сообщений в день
+   Хранится: localStorage key "ravoni_ai_limit"
+   Структура: { count: N, resetTime: timestamp_полночь }
+   ═══════════════════════════════════════════════════════ */
+const LS_LIMIT_KEY = 'ravoni_ai_limit';
+
+function getLimitData() {
+  try { return JSON.parse(localStorage.getItem(LS_LIMIT_KEY)); } catch { return null; }
+}
+function getMsgCount() {
+  const d = getLimitData();
+  if (!d) return 0;
+  if (Date.now() >= d.resetTime) { localStorage.removeItem(LS_LIMIT_KEY); return 0; }
+  return d.count || 0;
+}
+function incrementMsgCount() {
+  const d = getLimitData(), now = Date.now();
+  if (!d || now >= d.resetTime) {
+    const midnight = new Date(); midnight.setHours(24,0,0,0);
+    localStorage.setItem(LS_LIMIT_KEY, JSON.stringify({ count:1, resetTime:midnight.getTime() }));
+    return 1;
+  }
+  const n = (d.count||0)+1;
+  localStorage.setItem(LS_LIMIT_KEY, JSON.stringify({...d, count:n}));
+  return n;
+}
+function isLimitReached() { return getMsgCount() >= DAILY_MSG_LIMIT; }
+
+// Счётчик в тулбаре
+function updateCounterUI() {
+  const cnt = getMsgCount(), el = document.getElementById('aiMsgCounter');
+  if (!el) return;
+  el.textContent = cnt+'/'+DAILY_MSG_LIMIT;
+  el.className = 'ai-msg-counter' + (cnt>=12?' danger':cnt>=8?' warn':'');
+}
+
+// Показ/скрытие лимит-баннера
+let countdownInterval = null;
+function showLimitBanner() {
+  document.getElementById('aiInputRow').style.display = 'none';
+  document.getElementById('aiLimitWrap').classList.add('show');
+  const d = getLimitData(); if (!d) return;
+  const rt = new Date(d.resetTime);
+  document.getElementById('limitResetTime').textContent =
+    rt.getHours().toString().padStart(2,'0')+':'+rt.getMinutes().toString().padStart(2,'0');
+  if (countdownInterval) clearInterval(countdownInterval);
+  function tick() {
+    const diff = d.resetTime - Date.now();
+    if (diff<=0) { clearInterval(countdownInterval); location.reload(); return; }
+    const h=Math.floor(diff/3600000), m=Math.floor((diff%3600000)/60000), s=Math.floor((diff%60000)/1000);
+    document.getElementById('limitCountdown').textContent =
+      h.toString().padStart(2,'0')+':'+m.toString().padStart(2,'0')+':'+s.toString().padStart(2,'0');
+  }
+  tick(); countdownInterval = setInterval(tick,1000);
+}
+
+/* ═══════════════════════════════════
+   ИСТОРИЯ ЧАТОВ (localStorage)
+   ═══════════════════════════════════ */
+const LS_KEY = 'ravoni_chats';
+function loadSessions() { try{return JSON.parse(localStorage.getItem(LS_KEY)||'[]')}catch{return[]} }
+function saveSessions(s){ try{localStorage.setItem(LS_KEY,JSON.stringify(s))}catch{} }
+function saveCurrentSession() {
+  if (!chatHistory.length) return;
+  const sessions=loadSessions(), first=chatHistory.find(m=>m.role==='user');
+  const preview=first?first.content.slice(0,40)+(first.content.length>40?'...':''):'Чати нав';
+  const ex=sessions.findIndex(s=>s.id===currentSessionId);
+  const session={id:currentSessionId,date:new Date().toLocaleDateString('ru-RU'),preview,messages:[...chatHistory]};
+  if(ex>=0) sessions[ex]=session; else sessions.unshift(session);
+  saveSessions(sessions.slice(0,20));
+}
+
+/* Вспомогательные */
+function nowTime() {
+  const d=new Date(); return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
+}
+function updateModelUI() {
+  const m=AI_MODELS[currentModelIdx];
+  document.getElementById('aiModelLabel').textContent=m.label;
+  document.getElementById('modelBadge').textContent=m.badge;
+}
+function parseLinks(text) {
+  let h=text.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  h=h.replace(/(https?:\/\/t\.me\/[\w_]+)/g,'<a href="$1" target="_blank">$1</a>');
+  h=h.replace(/@([\w_]{3,})/g,'<a href="https://t.me/$1" target="_blank">@$1</a>');
+  return h;
+}
+function addMsg(role,text) {
+  const c=document.getElementById('aiMsgs'), d=document.createElement('div');
+  d.className='msg '+role;
+  const content=role==='ai'?parseLinks(text):text.replace(/\n/g,'<br>');
+  d.innerHTML=`<div class="msg-av">${role==='ai'?'AI':'👤'}</div><div><div class="msg-bbl">${content}</div><div class="msg-t">${nowTime()}</div></div>`;
+  c.appendChild(d); c.scrollTop=c.scrollHeight;
+}
+function addSysMsg(text) {
+  const c=document.getElementById('aiMsgs'), d=document.createElement('div');
+  d.className='model-switch-msg'; d.textContent=text; c.appendChild(d); c.scrollTop=c.scrollHeight;
+}
+function showTyping() {
+  const c=document.getElementById('aiMsgs'), d=document.createElement('div');
+  d.className='msg ai'; d.id='typingMsg';
+  d.innerHTML=`<div class="msg-av">AI</div><div class="typing"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>`;
+  c.appendChild(d); c.scrollTop=c.scrollHeight;
+}
+function rmTyping() { const t=document.getElementById('typingMsg'); if(t)t.remove(); }
+
+/* ═══════════════════════════════════
+   ОТПРАВИТЬ СООБЩЕНИЕ
+   ═══════════════════════════════════ */
+async function sendMsg() {
+  if (isLimitReached()) { showLimitBanner(); return; }
+  const inp=document.getElementById('aiInp'), txt=inp.value.trim();
+  if (!txt) return;
+  const qb=document.getElementById('quickBtns'); if(qb)qb.style.display='none';
+  inp.value='';
+  addMsg('user',txt);
+  chatHistory.push({role:'user',content:txt});
+  showTyping();
+  const newCount=incrementMsgCount();
+  updateCounterUI();
+  await callGroqAPI(txt);
+  // Показываем лимит-сообщение на 15-м
+  if (newCount>=DAILY_MSG_LIMIT) {
+    setTimeout(()=>{
+      addMsg('ai',`⏰ Шумо лимити рӯзонаи ${DAILY_MSG_LIMIT} паёмро истифода бурдед!\nФардо соати 00:00 шумо метавонед боз нависед 🌿`);
+      setTimeout(showLimitBanner,1200);
+    },400);
+  }
+}
+
+/* GROQ API + fallback M2 */
+async function callGroqAPI(userText, isRetry=false) {
+  const model=AI_MODELS[currentModelIdx];
+  try {
+    const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ_API_KEY}`},
+      body:JSON.stringify({model:model.id,max_tokens:150,temperature:0.7,
+        messages:[{role:'system',content:SYSTEM_PROMPT},...chatHistory.slice(-10)]})
+    });
+    const data=await r.json(); rmTyping();
+    if (r.status===429||data.error?.code==='rate_limit_exceeded') {
+      if (!isRetry&&currentModelIdx===0) {
+        currentModelIdx=1; updateModelUI();
+        addSysMsg('⚠️ Модел 1 банд → Модел 2 (Gemma) ба кор даромад!');
+        showTyping(); await callGroqAPI(userText,true); return;
+      } else { addMsg('ai','Ҳарду модел банд 😔\nЧанд дақиқа интизор шавед.\n\n🔧 → @Mustafo_IT'); return; }
+    }
+    if (data.error) { addMsg('ai','Хатогӣ рух дод 😔\n\n→ @Mustafo_IT'); return; }
+    let reply=data.choices?.[0]?.message?.content||'Бубахшед, ҷавоб нагирифтам 😔';
+    if (reply.length>MAX_RESPONSE_CHARS) reply=reply.slice(0,MAX_RESPONSE_CHARS-3)+'...';
+    chatHistory.push({role:'assistant',content:reply});
+    addMsg('ai',reply); saveCurrentSession();
+  } catch(err) {
+    rmTyping(); addMsg('ai','Интернет пайваст нашуд 😔\n\n🔧 → @Mustafo_IT'); console.error(err);
+  }
+}
+
+function quickAsk(text) { document.getElementById('aiInp').value=text; sendMsg(); }
+
+/* История чатов */
+function showHistory() { saveCurrentSession(); renderHistoryList(); document.getElementById('histPanel').classList.add('open'); }
+function closeHistory() { document.getElementById('histPanel').classList.remove('open'); }
+function renderHistoryList() {
+  const sessions=loadSessions(), list=document.getElementById('histList');
+  if (!sessions.length) { list.innerHTML='<div class="hist-empty">Чати сабт нашудааст 🕊️</div>'; return; }
+  list.innerHTML=sessions.map(s=>`
+    <div class="hist-item" onclick="loadSession('${s.id}')">
+      <div><div class="hist-item-t">${s.preview}</div><div class="hist-item-d">${s.date}</div></div>
+      <div class="hist-del" onclick="event.stopPropagation();deleteSession('${s.id}')">🗑️</div>
+    </div>`).join('');
+}
+function loadSession(id) {
+  const session=loadSessions().find(s=>s.id===id); if(!session)return;
+  saveCurrentSession(); chatHistory=[...session.messages]; currentSessionId=id; closeHistory();
+  const c=document.getElementById('aiMsgs'); c.innerHTML='';
+  chatHistory.forEach(m=>addMsg(m.role==='assistant'?'ai':m.role,m.content));
+  addSysMsg('📂 Чати қаблӣ бор карда шуд');
+}
+function deleteSession(id) { saveSessions(loadSessions().filter(s=>s.id!==id)); renderHistoryList(); }
+function clearAllHistory() {
+  if(!confirm('Ҳамаи таърихро тоза кунед?'))return;
+  localStorage.removeItem(LS_KEY); renderHistoryList();
+}
+
+/* Новый чат */
+function newChat() {
+  saveCurrentSession(); chatHistory=[]; currentSessionId='session_'+Date.now();
+  document.getElementById('aiMsgs').innerHTML='';
+  addMsg('ai','Чати нав! 🌿 Чӣ гуна ба шумо кӯмак карда метавонам?');
+  const qb=document.getElementById('quickBtns'); if(qb)qb.style.display='flex';
+  document.getElementById('aiInp').focus(); addSysMsg('✏️ Чати нав оғоз ёфт');
+}
+
+/* Переподключить */
+function reconnectModel() {
+  currentModelIdx=currentModelIdx===0?1:0; updateModelUI();
+  addSysMsg(`🔄 ${AI_MODELS[currentModelIdx].label} ба кор даромад`);
+}
+
+
+
+/* ═══════════════════════════════════
+   TELEGRAM MINI APP — интеграция
+   ═══════════════════════════════════ */
+const TG = window.Telegram?.WebApp;
+
+function initTelegramApp() {
+  if (!TG) return; // Открыт в браузере, не в TG
+
+  // Расширяем на весь экран
+  TG.expand();
+  TG.ready();
+
+  // Загружаем данные пользователя
+  const user = TG.initDataUnsafe?.user;
+  if (user) {
+    const name = user.username ? '@' + user.username : (user.first_name || 'Корбар');
+    const id   = user.id || '—';
+
+    // Обновляем профиль
+    document.getElementById('profName').textContent = name;
+    document.getElementById('profId').textContent   = 'ID: ' + id;
+    document.getElementById('cardName').textContent = name;
+    document.getElementById('cardId').textContent   = id;
+
+    // Фото профиля — если есть
+    if (user.photo_url) {
+      const av = document.getElementById('profAv');
+      av.innerHTML = `<img src="${user.photo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+    }
+
+    // Greeting в AI чате
+    const greeting = `Салом, ${user.first_name || 'дӯст'}! 👋 Ман AI ёрдамчии Платформаи РАВОНИ ҳастам 🌿\n\nДар бораи курсҳо, тест ва платформа ба ман савол диҳед!`;
+    const firstMsg = document.querySelector('#aiMsgs .msg-bbl');
+    if (firstMsg) firstMsg.innerHTML = greeting.replace(/\n/g,'<br>');
+  }
+
+  // Настраиваем кнопку PWA под Telegram
+  const pwaCard = document.getElementById('pwaCard');
+  if (TG.addToHomeScreen) {
+    // Новый TG поддерживает addToHomeScreen
+    document.getElementById('pwaTitle').textContent = 'Ба экрани асосӣ илова кун';
+    document.getElementById('pwaSub').textContent   = 'Telegram → Ба экрани асосӣ насб кунед';
+    document.getElementById('pwaIcon').textContent  = '📱';
+  }
+}
+
+/* ═══════════════════════════════════
+   PWA INSTALL — умная кнопка
+   ═══════════════════════════════════ */
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Меняем текст кнопки — браузер поддерживает установку
+  document.getElementById('pwaTitle').textContent = 'Ба экрани асосӣ насб кунед';
+  document.getElementById('pwaSub').textContent   = 'Як клик — барнома омода!';
+});
+
+function installPWA() {
+  // Вариант 1: Telegram addToHomeScreen (новые версии TG)
+  if (TG?.addToHomeScreen) {
+    TG.addToHomeScreen();
+    return;
+  }
+  // Вариант 2: Стандартный браузерный beforeinstallprompt
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choice) => {
+      if (choice.outcome === 'accepted') {
+        document.getElementById('pwaTitle').textContent = 'Насб карда шуд ✅';
+        document.getElementById('pwaSub').textContent   = 'Барнома ба экран илова шуд!';
+      }
+      deferredPrompt = null;
+    });
+    return;
+  }
+  // Вариант 3: Инструкция (iOS Safari / старый TG)
+  const isTG = !!TG;
+  const msg  = isTG
+    ? 'Барои насб кардан:\nTelegram → ⋮ (3 нуқта) → "Ба экрани асосӣ илова кунед"'
+    : 'Барои насб кардан:\n📱 Android: Chrome → ⋮ → Ба экран илова кунед\n🍎 iPhone: Safari → 📤 → Ба экрани асосӣ илова кунед';
+  alert(msg);
+}
+
+/* ═══════════════════════════════════
+   INIT
+   ═══════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  updateModelUI();
+  updateCounterUI();
+  currentSessionId = 'session_' + Date.now();
+  // Загружаем посты (Firebase или статичные)
+  loadPosts();
+  // Проверяем лимит — если уже достигнут, блокируем сразу
+  if (isLimitReached()) showLimitBanner();
+  // Инициализация Telegram Mini App
+  initTelegramApp();
+});
+</script>
+</body>
+</html>
