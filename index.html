@@ -1261,9 +1261,7 @@ async function callGeminiAPI(userText, modelIdx=0) {
 function quickAsk(text) { document.getElementById('aiInp').value=text; sendMsg(); }
 
 function sharePost(text) {
-  const msg = encodeURIComponent(text + '...
-
-🌿 Платформаи РАВОНИ — https://t.me/kudaki_darun_bot');
+  const msg = encodeURIComponent(text + '...\n\n🌿 Платформаи РАВОНИ — https://t.me/kudaki_darun_bot');
   const url = `https://t.me/share/url?url=https://t.me/kudaki_darun_bot&text=${msg}`;
   if (window.Telegram?.WebApp) {
     window.Telegram.WebApp.openTelegramLink(url);
@@ -1273,10 +1271,7 @@ function sharePost(text) {
 }
 
 function shareApp() {
-  const msg = encodeURIComponent('🌿 Платформаи РАВОНИ — шифои равонӣ бо Ҷаннат Абдуллоева!
-
-Курсҳо, тест ва маслиҳат — ройгон!
-👉 https://t.me/kudaki_darun_bot');
+  const msg = encodeURIComponent('🌿 Платформаи РАВОНИ — шифои равонӣ бо Ҷаннат Абдуллоева!\n\nКурсҳо, тест ва маслиҳат — ройгон!\n👉 https://t.me/kudaki_darun_bot');
   const url = `https://t.me/share/url?url=https://t.me/kudaki_darun_bot&text=${msg}`;
   if (window.Telegram?.WebApp) {
     window.Telegram.WebApp.openTelegramLink(url);
