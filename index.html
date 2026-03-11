@@ -1010,7 +1010,7 @@ function renderPost(p) {
     <div class="ptxt">${(p.text||'').replace(/\n/g,'<br>')}</div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;">
       <div class="pviews">👁 ${p.views||0} бинанда</div>
-      <button onclick="sharePost('${(p.text||'').replace(/'/g,\"\\'\"').slice(0,80)}')" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--green);font-weight:500;display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:20px;background:var(--gp);">📤 Мубодила</button>
+      <button onclick="sharePost(this.getAttribute('data-txt'))" data-txt="${(p.text||'').slice(0,80)}" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--green);font-weight:500;display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:20px;background:var(--gp);">📤 Мубодила</button>
     </div>
   </div>`;
 }
