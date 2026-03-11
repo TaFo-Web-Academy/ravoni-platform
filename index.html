@@ -137,6 +137,7 @@ html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bp)
 .ch { background:linear-gradient(135deg,#1a3d2a,var(--green)); padding:24px 20px; }
 .ch .sec-t { color:#fff; margin-bottom:5px; }
 .ch p { font-size:13px; color:rgba(255,255,255,.65); font-weight:300; }
+.ch .sec-t em { color:#e8c99a; }
 .cfilter { display:flex; gap:8px; padding:14px 20px 10px; overflow-x:auto; }
 .cfilter::-webkit-scrollbar { display:none; }
 .fb {
@@ -205,7 +206,7 @@ html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bp)
 
 /* ── COURSE PLAYLIST SCREEN ── */
 .cpl-overlay {
-  display:none; position:fixed; inset:0; background:var(--bg);
+  display:none; position:fixed; inset:0; background:var(--white);
   z-index:998; overflow-y:auto; flex-direction:column;
 }
 .cpl-overlay.open { display:flex; animation:fadeIn .25s ease; }
@@ -492,7 +493,7 @@ html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bp)
   <div class="home-hero">
     <div class="hg a1">Хуш омадед 👋</div>
     <div class="ht a2">Кӯдаки <em>дарун</em>атро шифо деҳ</div>
-    <div class="hb a3">🌱 Бо Чаннат Абдулоева</div>
+    <div class="hb a3">🌱 Бо Ҷаннат Абдуллоева</div>
   </div>
   <div class="hbody">
     <div class="phdr a4">
@@ -517,77 +518,59 @@ html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bp)
   </div>
   <div class="cl">
 
-    <!-- Курс 1 — Ройгон -->
     <!-- ══ Курс 1 — РОЙГОН ══ -->
     <div class="cc a1" data-type="free">
-      <div class="c-video" onclick="playVideo('YOUTUBE_ID_1','Кӯдаки дарун чист?')">
-        <!-- 📸 ПРЕВЬЮ ВИДЕО 1: замените src на реальный thumbnail из Cloudinary/YouTube -->
-        <img class="c-thumb" src="https://images.unsplash.com/photo-1476234251651-f353703a034d?w=400&h=225&fit=crop" alt="Курс 1" loading="lazy">
       <div class="c-video" onclick="openPlaylist()" style="cursor:pointer">
-        <img class="c-thumb" src="https://img.youtube.com/vi/tzEkJ_OpkPs/hqdefault.jpg" alt="Кӯдаки дарун чист?" loading="lazy">
+        <img class="c-thumb" src="https://img.youtube.com/vi/tzEkJ_OpkPs/hqdefault.jpg" alt="4 чизе ки муҳаббатро мекушад" loading="lazy">
         <span class="v-bdg bf">РОЙГОН</span>
         <div class="v-play">▶️</div>
-        <span class="v-dur">7:24</span>
         <span class="v-dur">3 қисм</span>
       </div>
       <div class="c-body">
         <div class="c-tags"><span class="ctag">Мафҳум</span><span class="ctag">3 аломат</span><span class="ctag">Қадами аввал</span></div>
-        <div class="c-title">Кӯдаки дарун чист?</div>
-        <div class="c-desc">Дарси муқаддимавии ройгон. Фаҳмед, ки кӯдаки дарун чист ва чаро ин барои зиндагии шумо муҳим аст.</div>
+        <div class="c-title">4 чизе ки муҳаббатро мекушад</div>
+        <div class="c-desc">Зан бояд ислоҳ шавад дар робита беҳтар аст ё мард?</div>
         <div class="c-foot">
           <div class="c-price pfree">Ройгон</div>
-          <a href="https://t.me/Jannat_Abdullaeva_Admin" target="_blank" class="bbuy">Тамошо кунед</a>
           <button class="bbuy" onclick="openPlaylist()">Тамошо кардан</button>
         </div>
       </div>
     </div>
 
-    <!-- Курс 2 — Пулакӣ -->
     <!-- ══ Курс 2 — ПУЛАКӢ ══ -->
     <div class="cc a2" data-type="paid">
-      <div class="c-video c-video-alt1" onclick="playVideo('YOUTUBE_ID_2','Шифои Асосӣ')">
-        <!-- 📸 ПРЕВЬЮ ВИДЕО 2 -->
       <div class="c-video c-video-alt1" style="cursor:pointer" onclick="document.getElementById('promoNote2').style.display='block'">
         <img class="c-thumb" src="https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=400&h=225&fit=crop" alt="Курс 2" loading="lazy">
         <span class="v-bdg bp2">ПУЛАКӢ</span>
         <div class="v-play">▶️</div>
-        <span class="v-dur">12:50</span>
         <span class="v-dur">Промо</span>
       </div>
       <div class="c-body">
         <div class="c-tags"><span class="ctag">20+ дарс</span><span class="ctag">Машқ</span><span class="ctag">Гувоҳнома</span></div>
         <div class="c-title">Шифои Асосӣ — 4 ҳафта</div>
-        <div class="c-desc">Барномаи 4-ҳафтаина барои шифои захмҳои кӯдакӣ. Дарсҳои видеоӣ, машқҳои амалӣ ва дастгирии гурӯҳӣ.</div>
         <div class="c-desc">Барномаи 4-ҳафтаина барои шифои захмҳои кӯдакӣ. Дарсҳои видеоӣ, машқҳои амалӣ ва дастгирии гурӯҳӣ 🌱</div>
         <div id="promoNote2" style="display:none;font-size:11px;color:var(--muted);margin:6px 0;padding:8px;background:var(--gp);border-radius:8px;">⏳ Промо-видео тез илова мешавад!</div>
-        <div class="c-foot">
-          <div class="c-price">350 сом.</div>
-          <a href="https://t.me/Jannat_Abdullaeva_Admin" target="_blank" class="bbuy">Харидан</a>
+        <div class="c-foot" style="flex-direction:column;align-items:stretch;gap:8px;">
+          <a href="https://t.me/Jannat_Abdullaeva_Admin" target="_blank" class="bbuy" style="text-align:center;">📩 Барои маълумот ба Менеҷер муроҷиат кунед</a>
         </div>
       </div>
     </div>
 
-    <!-- Курс 3 — Пулакӣ -->
     <!-- ══ Курс 3 — ПУЛАКӢ ══ -->
     <div class="cc a3" data-type="paid">
-      <div class="c-video c-video-alt2" onclick="playVideo('YOUTUBE_ID_3','Муносибатҳои солим')">
-        <!-- 📸 ПРЕВЬЮ ВИДЕО 3 -->
       <div class="c-video c-video-alt2" style="cursor:pointer" onclick="document.getElementById('promoNote3').style.display='block'">
         <img class="c-thumb" src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=225&fit=crop" alt="Курс 3" loading="lazy">
         <span class="v-bdg bp2">ПУЛАКӢ</span>
         <div class="v-play">▶️</div>
-        <span class="v-dur">15:10</span>
         <span class="v-dur">Промо</span>
       </div>
       <div class="c-body">
         <div class="c-tags"><span class="ctag">Психология</span><span class="ctag">Ҳудудгузорӣ</span><span class="ctag">Машқ</span></div>
         <div class="c-title">Муносибатҳои солим</div>
-        <div class="c-desc">Чӣ тавр муносибатҳои солим созед ва аз намунаҳои нодурусти гузашта раҳо шавед.</div>
         <div class="c-desc">Аз намунаҳои нодурусти гузашта раҳо шав. Муносибатҳои солим биёмӯз 💚</div>
         <div id="promoNote3" style="display:none;font-size:11px;color:var(--muted);margin:6px 0;padding:8px;background:var(--gp);border-radius:8px;">⏳ Промо-видео тез илова мешавад!</div>
-        <div class="c-foot">
-          <div class="c-price">490 сом.</div>
-          <a href="https://t.me/Jannat_Abdullaeva_Admin" target="_blank" class="bbuy">Харидан</a>
+        <div class="c-foot" style="flex-direction:column;align-items:stretch;gap:8px;">
+          <a href="https://t.me/Jannat_Abdullaeva_Admin" target="_blank" class="bbuy" style="text-align:center;">📩 Барои маълумот ба Менеҷер муроҷиат кунед</a>
         </div>
       </div>
     </div>
@@ -606,15 +589,15 @@ html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bp)
 
     <!-- Часть 1 -->
     <div class="cpl-item">
-      <div class="cpl-thumb" onclick="playVideo('tzEkJ_OpkPs','Қисми 1 — Кӯдаки дарун чист?')">
+      <div class="cpl-thumb" onclick="playVideo('tzEkJ_OpkPs','4 чизе ки муҳаббатро мекушад')">
         <img src="https://img.youtube.com/vi/tzEkJ_OpkPs/hqdefault.jpg" alt="Қисми 1" loading="lazy">
         <div class="cpl-play-btn"><span>▶</span></div>
         <span class="cpl-part-badge">ҚИСМИ 1</span>
         <span class="cpl-dur">14:22</span>
       </div>
       <div class="cpl-info">
-        <div class="cpl-part-title">Қисми 1 — Кӯдаки дарун чист?</div>
-        <div class="cpl-desc">Мафҳуми кӯдаки дарун. Чаро ин барои зиндагии шумо муҳим аст ва аз куҷо оғоз кардан лозим.</div>
+        <div class="cpl-part-title">4 чизе ки муҳаббатро мекушад</div>
+        <div class="cpl-desc">Зан бояд ислоҳ шавад дар робита беҳтар аст ё мард?</div>
       </div>
     </div>
 
@@ -634,15 +617,15 @@ html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bp)
 
     <!-- Часть 3 -->
     <div class="cpl-item">
-      <div class="cpl-thumb" onclick="playVideo('rJASmxmFsUs','Қисми 3 — 4 чизе ки муҳаббатро мекушад')">
+      <div class="cpl-thumb" onclick="playVideo('rJASmxmFsUs','12 фарқияти ки қабул надорем')">
         <img src="https://img.youtube.com/vi/rJASmxmFsUs/hqdefault.jpg" alt="Қисми 3" loading="lazy">
         <div class="cpl-play-btn"><span>▶</span></div>
         <span class="cpl-part-badge">ҚИСМИ 3</span>
         <span class="cpl-dur">14:52</span>
       </div>
       <div class="cpl-info">
-        <div class="cpl-part-title">Қисми 3 — 4 чизе ки муҳаббатро мекушад</div>
-        <div class="cpl-desc">Чаро муносибатҳо хароб мешаванд ва кӯдаки дарун дар ин чӣ нақш дорад. Роҳи баромад.</div>
+        <div class="cpl-part-title">12 фарқияти ки қабул надорем</div>
+        <div class="cpl-desc">12 фарқияти байни зан ва мард ки намедонем.</div>
       </div>
     </div>
 
@@ -676,21 +659,22 @@ html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bp)
 <!-- ════════════ EXPERT ════════════ -->
 <div id="screen-expert" class="screen">
   <div class="eh">
-    <!-- 📸 ФОТО ЭКСПЕРТА: замените src на реальное фото Чаннат из Cloudinary -->
+    <!-- 📸 ФОТО ЭКСПЕРТА: замените src на реальное фото Чаннат из Cloudinary <img src=" -->
     <div class="eph asc">
-<img src="jannat_abd.jpg"
-    <div class="en a1">Чаннат Абдулоева</div>
+      <img src="jannat_abd.jpg" alt="Ҷаннат Абдуллоева" >
+    </div>
+    <div class="en a1">Ҷаннат Абдуллоева</div>
     <div class="es a2">Равоншинос • Мураббии шахсӣ</div>
     <div class="estats a3">
-      <div><span class="sn">5+</span><span class="sl">Солҳо</span></div>
-      <div><span class="sn">500+</span><span class="sl">Муштариён</span></div>
-      <div><span class="sn">3</span><span class="sl">Курсҳо</span></div>
+      <div><span class="sn">5+</span><span class="sl">Сол Таҷриба</span></div>
+      <div><span class="sn">2300+</span><span class="sl">Муштариён</span></div>
+      <div><span class="sn">10+</span><span class="sl">Курсҳо</span></div>
     </div>
   </div>
   <div class="ebody">
     <div class="esec a1">
       <div class="est">Дар бораи ман</div>
-      <div class="ebio">Ман Чаннат Абдулоева — равоншинос ва мураббии шахсии сертификатнок ҳастам. Зиёда аз 5 сол бо одамоне кор мекунам, ки мехоҳанд захмҳои кӯдакиро шифо диҳанд ва зиндагии хушбахттарро бисозанд.</div>
+      <div class="ebio">Ман Ҷаннат Абдуллоева — равоншинос ва мураббии шахсии сертификатнок ҳастам. Зиёда аз 5 сол бо одамоне кор мекунам, ки мехоҳанд захмҳои кӯдакиро шифо диҳанд ва зиндагии хушбахттарро бисозанд.</div>
     </div>
     <div class="esec a2">
       <div class="est">Дастовардҳо</div>
@@ -704,7 +688,7 @@ html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bp)
   </div>
 </div>
 
-<!-- ════════════ AI ЁРДАМЧИ ════════════ -->
+<!-- ════════════ ЁРДАМЧИИ РАВОНӢ ════════════ -->
 <div id="screen-ai" class="screen">
 
   <!-- История чатов (панель) -->
@@ -724,12 +708,12 @@ html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bp)
 
   <!-- Шапка AI чата -->
   <div class="ai-top">
-    <div class="ai-top-av" id="aiAvatar">AI</div>
+    <div class="ai-top-av" id="aiAvatar">РВ</div>
     <div class="ai-top-info">
-      <div class="ai-top-name">AI Ёрдамчи</div>
+      <div class="ai-top-name">Ёрдамчии Равонӣ</div>
       <div class="ai-top-sub">
         <span class="ai-status-dot" id="aiStatusDot"></span>
-        <span id="aiModelLabel">Модел 1 — Llama</span>
+        <span id="aiModelLabel">Равонӣ — Модел 1</span>
         &nbsp;<span class="model-badge" id="modelBadge">M1</span>
       </div>
     </div>
@@ -747,7 +731,7 @@ html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bp)
     <div class="msg ai">
       <div class="msg-av">AI</div>
       <div>
-        <div class="msg-bbl">Салом! 👋 Ман AI ёрдамчии Платформаи РАВОНИ ҳастам 🌿<br><br>Дар бораи курсҳо, тест ва платформа ба ман савол диҳед!</div>
+        <div class="msg-bbl">Салом! 👋 Ман Ёрдамчии Равонии Платформаи РАВОНИ ҳастам 🌿<br><br>Дар бораи курсҳо, тест ва платформа ба ман савол диҳед!</div>
         <div class="msg-t">Ҳозир</div>
       </div>
     </div>
@@ -839,7 +823,7 @@ html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bp)
   </div>
   <div class="nav-item" onclick="showTab('ai',this)">
     <div class="nav-icon">🤖</div>
-    <div class="nav-label">AI</div>
+    <div class="nav-label">Ёрдамчӣ</div>
   </div>
   <div class="nav-item" onclick="showTab('profile',this)">
     <div class="nav-icon">👤</div>
@@ -948,11 +932,11 @@ const FIREBASE_CONFIG = {
 
 // Статичные посты (пока Firebase не подключён — замените потом)
 const STATIC_POSTS = [
-  { author:'Чаннат Абдулоева', date:'6 март 2026 • 14:30', img:'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=400&h=225&fit=crop', text:'Кӯдаки дарун ин қисмати мост, ки ҳанӯз ба муҳаббат ва ғамхорӣ ниёз дорад. Вақте мо ба он эътибор медиҳем, тамоми зиндагиамон тағйир меёбад...', views:247 },
-  { author:'Чаннат Абдулоева', date:'4 март 2026 • 10:15', img:null, text:'3 аломате, ки кӯдаки дарунатон захм дорад:\n1️⃣ Аз танқид зуд ранҷидан\n2️⃣ Худро ҳамеша гунаҳкор ҳис кардан\n3️⃣ «Не» гуфтан мушкил будан.', views:189 },
-  { author:'Чаннат Абдулоева', date:'2 март 2026 • 09:00', img:'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=400&h=225&fit=crop', text:'Муҳаббат ба худ — ин худхоҳӣ нест. Ин шарти асосии саломатии равонӣ аст. Имрӯз як коре кунед, ки барои худатон хуш бошад 💛', views:312 },
-  { author:'Чаннат Абдулоева', date:'28 феврал 2026 • 18:45', img:null, text:'Агар дар муносибатҳо ҳамеша шумо аввал узр мепурсед — ин аломати зарб дидани кӯдаки дарун аст 🌿', views:156 },
-  { author:'Чаннат Абдулоева', date:'25 феврал 2026 • 12:00', img:'https://images.unsplash.com/photo-1477332552946-cfb384aeaf1c?w=400&h=225&fit=crop', text:'Тест гузаштед? 🧪 Натиҷаатонро бо дӯстон мубодила кунед 💙', views:203 }
+  { author:'Ҷаннат Абдуллоева', date:'6 март 2026 • 14:30', img:'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=400&h=225&fit=crop', text:'Кӯдаки дарун ин қисмати мост, ки ҳанӯз ба муҳаббат ва ғамхорӣ ниёз дорад. Вақте мо ба он эътибор медиҳем, тамоми зиндагиамон тағйир меёбад...', views:247 },
+  { author:'Ҷаннат Абдуллоева', date:'4 март 2026 • 10:15', img:null, text:'3 аломате, ки кӯдаки дарунатон захм дорад:\n1️⃣ Аз танқид зуд ранҷидан\n2️⃣ Худро ҳамеша гунаҳкор ҳис кардан\n3️⃣ «Не» гуфтан мушкил будан.', views:189 },
+  { author:'Ҷаннат Абдуллоева', date:'2 март 2026 • 09:00', img:'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=400&h=225&fit=crop', text:'Муҳаббат ба худ — ин худхоҳӣ нест. Ин шарти асосии саломатии равонӣ аст. Имрӯз як коре кунед, ки барои худатон хуш бошад 💛', views:312 },
+  { author:'Ҷаннат Абдуллоева', date:'28 феврал 2026 • 18:45', img:null, text:'Агар дар муносибатҳо ҳамеша шумо аввал узр мепурсед — ин аломати зарб дидани кӯдаки дарун аст 🌿', views:156 },
+  { author:'Ҷаннат Абдуллоева', date:'25 феврал 2026 • 12:00', img:'https://images.unsplash.com/photo-1477332552946-cfb384aeaf1c?w=400&h=225&fit=crop', text:'Тест гузаштед? 🧪 Натиҷаатонро бо дӯстон мубодила кунед 💙', views:203 }
 ];
 
 // Инициализация Firebase
@@ -965,15 +949,15 @@ try {
   }
 } catch(e) { console.log('Firebase:', e.message); }
 
-// Рендер одного поста
-const AUTHOR_PHOTO = "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=400&h=225&fit=crop"
+// Рендер одного поста const  
+const AUTHOR_PHOTO = 'jannat_abd.jpg'
 function renderPost(p) {
   const imgHtml = p.img ? `<div class="pimg-wrap"><img src="${p.img}" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></div>` : '';
   return `<div class="post-card a1">
     <div class="pmeta">
       <img class="pav" src="${AUTHOR_PHOTO}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <div class="pav-fallback" style="display:none">👩‍⚕️</div>
-      <div><div class="pauth">${p.author||'Чаннат Абдулоева'}</div><div class="pdt">${p.date||''}</div></div>
+      <div><div class="pauth">${p.author||'Ҷаннат Абдуллоева'}</div><div class="pdt">${p.date||''}</div></div>
     </div>${imgHtml}
     <div class="ptxt">${(p.text||'').replace(/\n/g,'<br>')}</div>
     <div class="pviews">👁 ${p.views||0} бинанда</div>
@@ -998,13 +982,17 @@ async function loadPosts() {
 }
 
 /* ═══════════════════════════════════════════════════════
-   AI CHAT — GROQ API
+   ЁРДАМЧИИ РАВОНӢ — Gemini API
    ═══════════════════════════════════════════════════════ */
-const GROQ_API_KEY = "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";
+const GEMINI_KEYS = [
+  "AIzaSyACjCqDARzJ8kKx6FQMFJPJeEOinPLMRrw",
+  "AIzaSyAho7VsLRZxmNDIW-nzazu8q-u3kF714eQ"
+];
+const GEMINI_MODEL = "gemini-2.0-flash";
 
 const AI_MODELS = [
-  { id: 'llama-3.3-70b-versatile', label: 'Модел 1 — Llama', badge: 'M1' },
-  { id: 'gemma2-9b-it',            label: 'Модел 2 — Gemma', badge: 'M2' }
+  { label: 'Равонӣ — Модел 1', badge: 'РВ' },
+  { label: 'Равонӣ — Модел 2', badge: 'РВ' }
 ];
 const MAX_RESPONSE_CHARS = 500;
 const DAILY_MSG_LIMIT    = 15;
@@ -1020,9 +1008,9 @@ const SYSTEM_PROMPT = `Ты AI-ассистент психологической
   Ссылки давай ТОЛЬКО если пользователь ПРЯМО спрашивает о покупке, консультации или технической ошибке.
 
 О ПЛАТФОРМЕ:
-- Психолог: Чаннат Абдулоева (5+ лет, 500+ клиентов)
+- Психолог: Ҷаннат Абдуллоева (5+ лет, 2300+ клиентов)
 - Бот: https://t.me/kudaki_darun_bot — тест «Оё кӯдаки даруни ту ҳанӯз захм дорад?»
-- Курсы: «Кӯдаки дарун чист?» (ройгон), «Шифои Асосӣ» (350 сом), «Муносибатҳои солим» (490 сом)
+- Курсы: «4 чизе ки муҳаббатро мекушад» (ройгон), «Шифои Асосӣ» (пулакӣ), «Муносибатҳои солим» (пулакӣ) — нарх тавассути менеҷер
 
 КОНТАКТЫ — только по запросу:
 - Харидан / консулатсия → https://t.me/Jannat_Abdullaeva_Admin
@@ -1126,7 +1114,7 @@ function addMsg(role,text) {
   const c=document.getElementById('aiMsgs'), d=document.createElement('div');
   d.className='msg '+role;
   const content=role==='ai'?parseLinks(text):text.replace(/\n/g,'<br>');
-  d.innerHTML=`<div class="msg-av">${role==='ai'?'AI':'👤'}</div><div><div class="msg-bbl">${content}</div><div class="msg-t">${nowTime()}</div></div>`;
+  d.innerHTML=`<div class="msg-av">${role==='ai'?'РВ':'👤'}</div><div><div class="msg-bbl">${content}</div><div class="msg-t">${nowTime()}</div></div>`;
   c.appendChild(d); c.scrollTop=c.scrollHeight;
 }
 function addSysMsg(text) {
@@ -1136,7 +1124,7 @@ function addSysMsg(text) {
 function showTyping() {
   const c=document.getElementById('aiMsgs'), d=document.createElement('div');
   d.className='msg ai'; d.id='typingMsg';
-  d.innerHTML=`<div class="msg-av">AI</div><div class="typing"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>`;
+  d.innerHTML=`<div class="msg-av">РВ</div><div class="typing"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>`;
   c.appendChild(d); c.scrollTop=c.scrollHeight;
 }
 function rmTyping() { const t=document.getElementById('typingMsg'); if(t)t.remove(); }
@@ -1155,7 +1143,7 @@ async function sendMsg() {
   showTyping();
   const newCount=incrementMsgCount();
   updateCounterUI();
-  await callGroqAPI(txt);
+  await callGeminiAPI(txt);
   // Показываем лимит-сообщение на 15-м
   if (newCount>=DAILY_MSG_LIMIT) {
     setTimeout(()=>{
@@ -1165,29 +1153,38 @@ async function sendMsg() {
   }
 }
 
-/* GROQ API + fallback M2 */
-async function callGroqAPI(userText, isRetry=false) {
-  const model=AI_MODELS[currentModelIdx];
+/* Gemini API + fallback key 2 */
+async function callGeminiAPI(userText, keyIdx=0) {
+  const apiKey = GEMINI_KEYS[keyIdx];
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+  const contents = chatHistory.slice(-10).map(m => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: m.content }]
+  }));
   try {
-    const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ_API_KEY}`},
-      body:JSON.stringify({model:model.id,max_tokens:150,temperature:0.7,
-        messages:[{role:'system',content:SYSTEM_PROMPT},...chatHistory.slice(-10)]})
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-goog-api-key': apiKey },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        contents: contents,
+        generationConfig: { maxOutputTokens: 200, temperature: 0.7 }
+      })
     });
-    const data=await r.json(); rmTyping();
-    if (r.status===429||data.error?.code==='rate_limit_exceeded') {
-      if (!isRetry&&currentModelIdx===0) {
-        currentModelIdx=1; updateModelUI();
-        addSysMsg('⚠️ Модел 1 банд → Модел 2 (Gemma) ба кор даромад!');
-        showTyping(); await callGroqAPI(userText,true); return;
-      } else { addMsg('ai','Ҳарду модел банд 😔\nЧанд дақиқа интизор шавед.\n\n🔧 → @Mustafo_IT'); return; }
+    const data = await r.json(); rmTyping();
+    if (!r.ok || data.error) {
+      if (keyIdx === 0) {
+        currentModelIdx = 1; updateModelUI();
+        addSysMsg('⚠️ Калиди 1 хато дод → Калиди 2 ба кор даромад!');
+        showTyping(); await callGeminiAPI(userText, 1); return;
+      } else {
+        addMsg('ai','Хатогӣ рух дод 😔\n\n🔧 → @Mustafo_IT'); return;
+      }
     }
-    if (data.error) { addMsg('ai','Хатогӣ рух дод 😔\n\n→ @Mustafo_IT'); return; }
-    let reply=data.choices?.[0]?.message?.content||'Бубахшед, ҷавоб нагирифтам 😔';
-    if (reply.length>MAX_RESPONSE_CHARS) reply=reply.slice(0,MAX_RESPONSE_CHARS-3)+'...';
-    chatHistory.push({role:'assistant',content:reply});
-    addMsg('ai',reply); saveCurrentSession();
+    let reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Бубахшед, ҷавоб нагирифтам 😔';
+    if (reply.length > MAX_RESPONSE_CHARS) reply = reply.slice(0, MAX_RESPONSE_CHARS-3) + '...';
+    chatHistory.push({ role: 'assistant', content: reply });
+    addMsg('ai', reply); saveCurrentSession();
   } catch(err) {
     rmTyping(); addMsg('ai','Интернет пайваст нашуд 😔\n\n🔧 → @Mustafo_IT'); console.error(err);
   }
@@ -1268,7 +1265,7 @@ function initTelegramApp() {
     }
 
     // Greeting в AI чате
-    const greeting = `Салом, ${user.first_name || 'дӯст'}! 👋 Ман AI ёрдамчии Платформаи РАВОНИ ҳастам 🌿\n\nДар бораи курсҳо, тест ва платформа ба ман савол диҳед!`;
+    const greeting = `Салом, ${user.first_name || 'дӯст'}! 👋 Ман Ёрдамчии Равонии Платформаи РАВОНИ ҳастам 🌿\n\nДар бораи курсҳо, тест ва платформа ба ман савол диҳед!`;
     const firstMsg = document.querySelector('#aiMsgs .msg-bbl');
     if (firstMsg) firstMsg.innerHTML = greeting.replace(/\n/g,'<br>');
   }
