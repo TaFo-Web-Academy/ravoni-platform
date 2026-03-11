@@ -950,7 +950,7 @@ try {
 } catch(e) { console.log('Firebase:', e.message); }
 
 // Рендер одного поста const  
-const AUTHOR_PHOTO = 'jannat_abd.jpg'
+const AUTHOR_PHOTO = 'Jannat_abd.jpg'
 function renderPost(p) {
   const imgHtml = p.img ? `<div class="pimg-wrap"><img src="${p.img}" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></div>` : '';
   return `<div class="post-card a1">
@@ -988,7 +988,7 @@ const GEMINI_KEYS = [
   "AIzaSyACjCqDARzJ8kKx6FQMFJPJeEOinPLMRrw",
   "AIzaSyAho7VsLRZxmNDIW-nzazu8q-u3kF714eQ"
 ];
-const GEMINI_MODEL = "gemini-2.0-flash";
+const GEMINI_MODEL = "gemini-2.0-flash-exp";
 
 const AI_MODELS = [
   { label: 'Равонӣ — Модел 1', badge: 'РВ' },
@@ -1157,36 +1157,58 @@ async function sendMsg() {
 async function callGeminiAPI(userText, keyIdx=0) {
   const apiKey = GEMINI_KEYS[keyIdx];
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
-  const contents = chatHistory.slice(-10).map(m => ({
-    role: m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: m.content }]
-  }));
+
+  // Строим contents: сначала system как первый user msg, потом история
+  const contents = [];
+  // System prompt как первый user+model обмен
+  contents.push({ role: 'user', parts: [{ text: SYSTEM_PROMPT }] });
+  contents.push({ role: 'model', parts: [{ text: 'Хуб, фаҳмидам. Ёрдам мекунам!' }] });
+  // История чата
+  chatHistory.slice(-10).forEach(m => {
+    contents.push({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }]
+    });
+  });
+
   try {
     const r = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-goog-api-key': apiKey },
+      headers: {
+        'Content-Type': 'application/json',
+        'X-goog-api-key': apiKey
+      },
       body: JSON.stringify({
-        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
         contents: contents,
         generationConfig: { maxOutputTokens: 200, temperature: 0.7 }
       })
     });
-    const data = await r.json(); rmTyping();
+    const data = await r.json();
+    rmTyping();
+
     if (!r.ok || data.error) {
+      console.error('Gemini key', keyIdx, data.error);
       if (keyIdx === 0) {
         currentModelIdx = 1; updateModelUI();
         addSysMsg('⚠️ Калиди 1 хато дод → Калиди 2 ба кор даромад!');
-        showTyping(); await callGeminiAPI(userText, 1); return;
+        showTyping();
+        await callGeminiAPI(userText, 1);
+        return;
       } else {
-        addMsg('ai','Хатогӣ рух дод 😔\n\n🔧 → @Mustafo_IT'); return;
+        addMsg('ai', 'Хатогӣ рух дод 😔\n\n🔧 → @Mustafo_IT');
+        return;
       }
     }
+
     let reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Бубахшед, ҷавоб нагирифтам 😔';
-    if (reply.length > MAX_RESPONSE_CHARS) reply = reply.slice(0, MAX_RESPONSE_CHARS-3) + '...';
+    if (reply.length > MAX_RESPONSE_CHARS) reply = reply.slice(0, MAX_RESPONSE_CHARS - 3) + '...';
     chatHistory.push({ role: 'assistant', content: reply });
-    addMsg('ai', reply); saveCurrentSession();
+    addMsg('ai', reply);
+    saveCurrentSession();
   } catch(err) {
-    rmTyping(); addMsg('ai','Интернет пайваст нашуд 😔\n\n🔧 → @Mustafo_IT'); console.error(err);
+    rmTyping();
+    addMsg('ai', 'Интернет пайваст нашуд 😔\n\n🔧 → @Mustafo_IT');
+    console.error(err);
   }
 }
 
@@ -1337,4 +1359,3 @@ window.addEventListener('DOMContentLoaded', () => {
 </body>
 
 </html>
-
