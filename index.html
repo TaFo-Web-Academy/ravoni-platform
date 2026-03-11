@@ -531,7 +531,10 @@ html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bp)
         <div class="c-title">4 чизе ки муҳаббатро мекушад</div>
         <div class="c-desc">Зан бояд ислоҳ шавад дар робита беҳтар аст ё мард?</div>
         <div class="c-foot">
-          <div class="c-price pfree">Ройгон</div>
+          <div>
+            <div class="c-price pfree">Ройгон</div>
+            <div id="courseViewCount" style="font-size:11px;color:var(--muted);margin-top:3px;">👁 Бор мешавад...</div>
+          </div>
           <button class="bbuy" onclick="openPlaylist()">Тамошо кардан</button>
         </div>
       </div>
@@ -660,11 +663,16 @@ html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bp)
 <div id="screen-expert" class="screen">
   <div class="eh">
     <!-- 📸 ФОТО ЭКСПЕРТА: замените src на реальное фото Чаннат из Cloudinary <img src=" -->
-    <div class="eph asc">
+    <div class="eph asc" style="position:relative;">
       <img src="Jannat_abd.jpg" alt="Ҷаннат Абдуллоева" >
+      <span style="position:absolute;bottom:6px;right:6px;width:16px;height:16px;background:#4caf50;border-radius:50%;border:2px solid #fff;display:block;box-shadow:0 0 0 3px rgba(76,175,80,.25);"></span>
     </div>
     <div class="en a1">Ҷаннат Абдуллоева</div>
     <div class="es a2">Равоншинос • Мураббии шахсӣ</div>
+    <div style="display:inline-flex;align-items:center;gap:5px;background:#e8f5e9;border-radius:20px;padding:4px 12px;margin-bottom:10px;">
+      <span style="width:7px;height:7px;background:#4caf50;border-radius:50%;display:inline-block;"></span>
+      <span style="font-size:11px;color:#2d7a3d;font-weight:500;">Ҳозир дастрас аст</span>
+    </div>
     <div class="estats a3">
       <div><span class="sn">5+</span><span class="sl">Сол Таҷриба</span></div>
       <div><span class="sn">2300+</span><span class="sl">Муштариён</span></div>
@@ -770,6 +778,16 @@ html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bp)
     <div class="prof-id a2" id="profId">ID: —</div>
   </div>
   <div class="pbody">
+    <!-- Поделиться платформой -->
+    <div class="pwa-card a1" onclick="shareApp()" style="background:linear-gradient(135deg,#1a6b3a,#2d8a4e);margin-bottom:12px;">
+      <div class="pwai">🌿</div>
+      <div>
+        <div class="pwat">Ба дӯстон фиристед</div>
+        <div class="pwas">Платформаро бо дигарон мубодила кунед!</div>
+      </div>
+      <div class="pwaa">›</div>
+    </div>
+
     <!-- PWA / Add to Home Screen -->
     <div class="pwa-card a1" onclick="installPWA()" id="pwaCard">
       <div class="pwai" id="pwaIcon">📲</div>
@@ -869,6 +887,36 @@ function filterC(btn, type) {
 function openPlaylist() {
   document.getElementById('cplOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+  // Реальный счётчик просмотров в Firebase
+  incrementCourseView('course_free');
+}
+
+async function incrementCourseView(courseId) {
+  if (!db) return;
+  try {
+    const ref = db.collection('course_views').doc(courseId);
+    const doc = await ref.get();
+    const current = doc.exists ? (doc.data().views || 0) : 0;
+    await ref.set({ views: current + 1 }, { merge: true });
+    // Обновляем UI счётчик
+    const el = document.getElementById('courseViewCount');
+    if (el) el.textContent = '👁 ' + formatViews(current + 1) + ' бинанда';
+  } catch(e) { console.log('View counter:', e); }
+}
+
+async function loadCourseViews() {
+  if (!db) return;
+  try {
+    const doc = await db.collection('course_views').doc('course_free').get();
+    const views = doc.exists ? (doc.data().views || 0) : 0;
+    const el = document.getElementById('courseViewCount');
+    if (el) el.textContent = '👁 ' + formatViews(views) + ' бинанда';
+  } catch(e) {}
+}
+
+function formatViews(n) {
+  if (n >= 1000) return (n/1000).toFixed(1).replace('.0','') + 'к';
+  return n;
 }
 function closePlaylist() {
   document.getElementById('cplOverlay').classList.remove('open');
@@ -960,7 +1008,10 @@ function renderPost(p) {
       <div><div class="pauth">${p.author||'Ҷаннат Абдуллоева'}</div><div class="pdt">${p.date||''}</div></div>
     </div>${imgHtml}
     <div class="ptxt">${(p.text||'').replace(/\n/g,'<br>')}</div>
-    <div class="pviews">👁 ${p.views||0} бинанда</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;">
+      <div class="pviews">👁 ${p.views||0} бинанда</div>
+      <button onclick="sharePost('${(p.text||'').replace(/'/g,\"\\'\"').slice(0,80)}')" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--green);font-weight:500;display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:20px;background:var(--gp);">📤 Мубодила</button>
+    </div>
   </div>`;
 }
 
@@ -984,12 +1035,16 @@ async function loadPosts() {
 /* ═══════════════════════════════════════════════════════
    ЁРДАМЧИИ РАВОНӢ — Gemini API
    ═══════════════════════════════════════════════════════ */
-const GEMINI_KEY = "AIzaSyAD3lqohYzJxDjrQXm12zdvQcOAoA2kuoQ";
-const GEMINI_MODEL = "gemini-2.0-flash";
+const GROQ_KEYS = [
+  "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",
+  "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"
+];
 
 const AI_MODELS = [
-  { label: 'Равонӣ — Модел 1', badge: 'РВ' },
-  { label: 'Равонӣ — Модел 2', badge: 'РВ' }
+  { id: 'llama-3.3-70b-versatile', label: 'Равонӣ — Модел 1', badge: 'РВ',
+    intro: 'Салом! 👋 Ман Модели Аввал ҳастам — барои ҷавобҳои мукаммал ва мавзӯоти равоншиносӣ омодаам 🌿' },
+  { id: 'gemma2-9b-it',            label: 'Равонӣ — Модел 2', badge: 'РВ',
+    intro: 'Салом! 👋 Ман Модели Дуюм ҳастам — зуд ва дақиқ ҷавоб медиҳам. Чӣ гуна ёрдам карда метавонам? 🌿' }
 ];
 const MAX_RESPONSE_CHARS = 500;
 const DAILY_MSG_LIMIT    = 15;
@@ -1151,44 +1206,47 @@ async function sendMsg() {
 }
 
 /* Gemini API + fallback key 2 */
-async function callGeminiAPI(userText) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
-
-  // История для контекста
-  const history = chatHistory.slice(-10).map(m => ({
-    role: m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: m.content }]
-  }));
-
-  // System prompt + история + текущий вопрос
-  const contents = [
-    { role: 'user',  parts: [{ text: SYSTEM_PROMPT }] },
-    { role: 'model', parts: [{ text: 'Фаҳмидам, ёрдам мекунам!' }] },
-    ...history
-  ];
-
+async function callGeminiAPI(userText, modelIdx=0) {
+  const model = AI_MODELS[modelIdx];
   try {
-    const r = await fetch(url, {
+    const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-goog-api-key': GEMINI_KEY
+        'Authorization': `Bearer ${GROQ_KEYS[modelIdx] || GROQ_KEYS[0]}`
       },
       body: JSON.stringify({
-        contents,
-        generationConfig: { maxOutputTokens: 200, temperature: 0.7 }
+        model: model.id,
+        max_tokens: 150,
+        temperature: 0.7,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          ...chatHistory.slice(-10)
+        ]
       })
     });
     const data = await r.json();
     rmTyping();
 
-    if (!r.ok || data.error) {
-      console.error('Gemini error:', data.error);
+    if (r.status === 429 || data.error?.code === 'rate_limit_exceeded') {
+      if (modelIdx === 0) {
+        currentModelIdx = 1; updateModelUI();
+        addSysMsg('⚠️ Модел 1 банд → Модел 2 ба кор даромад!');
+        setTimeout(() => addMsg('ai', AI_MODELS[1].intro), 300);
+        showTyping();
+        await callGeminiAPI(userText, 1);
+        return;
+      } else {
+        addMsg('ai', 'Ҳарду модел банд 😔\nЧанд дақиқа интизор шавед.\n\n🔧 → @Mustafo_IT');
+        return;
+      }
+    }
+    if (data.error) {
       addMsg('ai', 'Хатогӣ рух дод 😔\n\n🔧 → @Mustafo_IT');
       return;
     }
 
-    let reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Бубахшед, ҷавоб нагирифтам 😔';
+    let reply = data.choices?.[0]?.message?.content || 'Бубахшед, ҷавоб нагирифтам 😔';
     if (reply.length > MAX_RESPONSE_CHARS) reply = reply.slice(0, MAX_RESPONSE_CHARS - 3) + '...';
     chatHistory.push({ role: 'assistant', content: reply });
     addMsg('ai', reply);
@@ -1201,6 +1259,31 @@ async function callGeminiAPI(userText) {
 }
 
 function quickAsk(text) { document.getElementById('aiInp').value=text; sendMsg(); }
+
+function sharePost(text) {
+  const msg = encodeURIComponent(text + '...
+
+🌿 Платформаи РАВОНИ — https://t.me/kudaki_darun_bot');
+  const url = `https://t.me/share/url?url=https://t.me/kudaki_darun_bot&text=${msg}`;
+  if (window.Telegram?.WebApp) {
+    window.Telegram.WebApp.openTelegramLink(url);
+  } else {
+    window.open(url, '_blank');
+  }
+}
+
+function shareApp() {
+  const msg = encodeURIComponent('🌿 Платформаи РАВОНИ — шифои равонӣ бо Ҷаннат Абдуллоева!
+
+Курсҳо, тест ва маслиҳат — ройгон!
+👉 https://t.me/kudaki_darun_bot');
+  const url = `https://t.me/share/url?url=https://t.me/kudaki_darun_bot&text=${msg}`;
+  if (window.Telegram?.WebApp) {
+    window.Telegram.WebApp.openTelegramLink(url);
+  } else {
+    window.open(url, '_blank');
+  }
+}
 
 /* История чатов */
 function showHistory() { saveCurrentSession(); renderHistoryList(); document.getElementById('histPanel').classList.add('open'); }
@@ -1240,6 +1323,7 @@ function newChat() {
 function reconnectModel() {
   currentModelIdx=currentModelIdx===0?1:0; updateModelUI();
   addSysMsg(`🔄 ${AI_MODELS[currentModelIdx].label} ба кор даромад`);
+  setTimeout(() => addMsg('ai', AI_MODELS[currentModelIdx].intro), 400);
 }
 
 
@@ -1336,8 +1420,15 @@ window.addEventListener('DOMContentLoaded', () => {
   updateModelUI();
   updateCounterUI();
   currentSessionId = 'session_' + Date.now();
+  // Модель представляется при первом запуске
+  setTimeout(() => {
+    const firstBbl = document.querySelector('#aiMsgs .msg-bbl');
+    if (firstBbl) firstBbl.innerHTML = AI_MODELS[0].intro.replace(/\n/g,'<br>');
+  }, 300);
   // Загружаем посты (Firebase или статичные)
   loadPosts();
+  // Загружаем счётчик просмотров курса
+  loadCourseViews();
   // Проверяем лимит — если уже достигнут, блокируем сразу
   if (isLimitReached()) showLimitBanner();
   // Инициализация Telegram Mini App
