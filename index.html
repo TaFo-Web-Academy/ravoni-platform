@@ -1233,7 +1233,7 @@ async function callGeminiAPI(userText, modelIdx=0) {
         systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
         contents: contents,
         generationConfig: {
-          maxOutputTokens: 150,
+          maxOutputTokens: 450,
           temperature: 0.7
         }
       })
