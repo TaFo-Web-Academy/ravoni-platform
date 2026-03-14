@@ -1100,28 +1100,13 @@ const AI_MODELS = [
   { id: 'gemini-flash-latest', label: 'Равонӣ — Модел 2', badge: 'РВ',
     intro: 'Салом! 👋 Ман Модели Дуюм ҳастам — зуд ва дақиқ ҷавоб медиҳам. Чӣ гуна ёрдам карда метавонам? 🌿' }
 ];
-const MAX_RESPONSE_CHARS = 1500;
-const DAILY_MSG_LIMIT    = 15;
+const MAX_RESPONSE_CHARS = 400;
+const DAILY_MSG_LIMIT    = 20;
 
-const SYSTEM_PROMPT = `Ты AI-ассистент психологической платформы "РАВОНИ" (Таджикистан).
-
-СТРОГИЕ ПРАВИЛА:
-- Отвечай ТОЛЬКО на таджикском языке (Тоҷикӣ)
-- Будь тёплым, поддерживающим, профессиональным
-- Ҷавоби мукаммал ва равшан бинавис — на хеле дароз, на хеле кӯтоҳ
-- Эмодзи — умеренно 🌿
-- ⛔ НЕ добавляй ссылки к каждому ответу!
-  Ссылки давай ТОЛЬКО если пользователь ПРЯМО спрашивает о покупке, консультации или технической ошибке.
-
-О ПЛАТФОРМЕ:
-- Психолог: Ҷаннат Абдуллоева (5+ лет, 2300+ клиентов)
-- Бот: https://t.me/kudaki_darun_bot — тест «Оё кӯдаки даруни ту ҳанӯз захм дорад?»
-- Курсы: «4 чизе ки муҳаббатро мекушад» (ройгон), «Шифои Асосӣ» (пулакӣ), «Муносибатҳои солим» (пулакӣ) — нарх тавассути менеҷер
-
-КОНТАКТЫ — только по запросу:
-- Харидан / консулатсия → https://t.me/Jannat_Abdullaeva_Admin
-- Хатои техникӣ → https://t.me/Mustafo_IT
-- Тест → https://t.me/kudaki_darun_bot`;
+const SYSTEM_PROMPT = `Ты ассистент платформы "РАВОНИ" (психология, Таджикистан).
+ПРАВИЛА: отвечай ТОЛЬКО на таджикском (Тоҷикӣ). Максимум 2 предложения! Без лишних слов. 1 эмодзи.
+Ссылки ТОЛЬКО если прямо просят: покупка→@Jannat_Abdullaeva_Admin, техника→@Mustafo_IT, тест→@kudaki_darun_bot
+Платформа: психолог Ҷаннат Абдуллоева, курсы: ройгон «4 чизе...», пулакӣ «Шифои Асосӣ», «Муносибатҳои солим».`;
 
 // ─── СОСТОЯНИЕ ────────────────────────────────────────
 let currentModelIdx  = 0;
@@ -1265,8 +1250,8 @@ async function callGeminiAPI(userText, modelIdx=0) {
   const apiKey  = GEMINI_KEYS[modelIdx] || GEMINI_KEYS[0];
   const url     = `https://generativelanguage.googleapis.com/v1beta/models/${model.id}:generateContent`;
 
-  // Конвертируем историю в Gemini-формат (roles: user / model)
-  const contents = chatHistory.slice(-10).map(m => ({
+  // Только последние 4 сообщения — экономия токенов!
+  const contents = chatHistory.slice(-4).map(m => ({
     role: m.role === 'assistant' ? 'model' : 'user',
     parts: [{ text: m.content }]
   }));
@@ -1282,7 +1267,7 @@ async function callGeminiAPI(userText, modelIdx=0) {
         systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
         contents: contents,
         generationConfig: {
-          maxOutputTokens: 1024,
+          maxOutputTokens: 150,
           temperature: 0.7
         }
       })
