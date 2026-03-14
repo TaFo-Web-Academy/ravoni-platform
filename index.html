@@ -855,31 +855,16 @@ html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bp)
     <div class="about-card a4">
       <div class="about-title">🌿 Дар Бораи Мо</div>
       <div class="about-video-wrap">
-        <video class="about-video" controls playsinline preload="metadata" poster="" id="aboutVideo">
-          <source src="https://raw.githubusercontent.com/TaFo-Web-Academy/ravoni-platform/main/Vidos2.mp4" type="video/mp4">
-        </video>
+        <iframe 
+          class="about-video" 
+          src="https://drive.google.com/file/d/16jFvaSBxec1qHK6qgBR2YBJxDNV1hx9d/preview"
+          allow="autoplay"
+          allowfullscreen
+          loading="lazy"
+          id="aboutVideo">
+        </iframe>
       </div>
-      <script>
-        const vid = document.getElementById('aboutVideo');
-        const src = vid.querySelector('source').src;
-        console.log('🎬 Video src:', src);
-        vid.addEventListener('loadstart',  () => console.log('✅ loadstart — загрузка началась'));
-        vid.addEventListener('loadeddata', () => console.log('✅ loadeddata — данные загружены'));
-        vid.addEventListener('canplay',    () => console.log('✅ canplay — видео готово'));
-        vid.addEventListener('error', (e) => {
-          const err = vid.error;
-          const codes = {1:'ABORTED',2:'NETWORK',3:'DECODE',4:'SRC_NOT_SUPPORTED'};
-          console.error('❌ Video Error:', codes[err?.code] || err?.code, err?.message);
-          console.error('❌ HTTP статус проверь: fetch("'+src+'").then(r=>console.log("HTTP:",r.status,r.headers.get("content-type")))');
-        });
-        vid.addEventListener('stalled',   () => console.warn('⚠️ stalled — загрузка зависла'));
-        // Сразу проверяем fetch
-        fetch(src, {method:'HEAD'}).then(r => {
-          console.log('🔍 Fetch HEAD статус:', r.status, r.statusText);
-          console.log('🔍 Content-Type:', r.headers.get('content-type'));
-          console.log('🔍 Content-Length:', r.headers.get('content-length'));
-        }).catch(e => console.error('❌ Fetch ошибка:', e.message));
-      </script>
+
       </div>
       <div class="about-desc">
         Платформаи РАВОНИ — маркази шифои равонӣ дар Тоҷикистон. Мо бо роҳбарии равоншиноси касбӣ Ҷаннат Абдуллоева ба шумо кӯмак мекунем, ки захмҳои кӯдакиро шифо диҳед ва зиндагии солим созед. 🌱
