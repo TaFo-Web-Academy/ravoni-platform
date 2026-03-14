@@ -1040,15 +1040,15 @@ async function loadPosts() {
 /* ═══════════════════════════════════════════════════════
    ЁРДАМЧИИ РАВОНӢ — Gemini API
    ═══════════════════════════════════════════════════════ */
-const GROQ_KEYS = [
-  "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",
-  "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"
+const GEMINI_KEYS = [
+  "AIzaSyC5U0UpJZ8kSYz-7P0zVWsJHVSt3nMgSB0",
+  "AIzaSyCpPIAPRA5NIkOCFspDgspMCyMA4u3B7RY"
 ];
 
 const AI_MODELS = [
-  { id: 'llama-3.3-70b-versatile', label: 'Равонӣ — Модел 1', badge: 'РВ',
+  { id: 'gemini-flash-latest', label: 'Равонӣ — Модел 1', badge: 'РВ',
     intro: 'Салом! 👋 Ман Модели Аввал ҳастам — барои ҷавобҳои мукаммал ва мавзӯоти равоншиносӣ омодаам 🌿' },
-  { id: 'gemma2-9b-it',            label: 'Равонӣ — Модел 2', badge: 'РВ',
+  { id: 'gemini-flash-latest', label: 'Равонӣ — Модел 2', badge: 'РВ',
     intro: 'Салом! 👋 Ман Модели Дуюм ҳастам — зуд ва дақиқ ҷавоб медиҳам. Чӣ гуна ёрдам карда метавонам? 🌿' }
 ];
 const MAX_RESPONSE_CHARS = 500;
@@ -1212,28 +1212,36 @@ async function sendMsg() {
 
 /* Gemini API + fallback key 2 */
 async function callGeminiAPI(userText, modelIdx=0) {
-  const model = AI_MODELS[modelIdx];
+  const model   = AI_MODELS[modelIdx];
+  const apiKey  = GEMINI_KEYS[modelIdx] || GEMINI_KEYS[0];
+  const url     = `https://generativelanguage.googleapis.com/v1beta/models/${model.id}:generateContent`;
+
+  // Конвертируем историю в Gemini-формат (roles: user / model)
+  const contents = chatHistory.slice(-10).map(m => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: m.content }]
+  }));
+
   try {
-    const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const r = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${GROQ_KEYS[modelIdx] || GROQ_KEYS[0]}`
+        'X-goog-api-key': apiKey
       },
       body: JSON.stringify({
-        model: model.id,
-        max_tokens: 150,
-        temperature: 0.7,
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          ...chatHistory.slice(-10)
-        ]
+        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        contents: contents,
+        generationConfig: {
+          maxOutputTokens: 150,
+          temperature: 0.7
+        }
       })
     });
     const data = await r.json();
     rmTyping();
 
-    if (r.status === 429 || data.error?.code === 'rate_limit_exceeded') {
+    if (r.status === 429 || data.error?.code === 429 || data.error?.status === 'RESOURCE_EXHAUSTED') {
       if (modelIdx === 0) {
         currentModelIdx = 1; updateModelUI();
         addSysMsg('⚠️ Модел 1 банд → Модел 2 ба кор даромад!');
@@ -1251,7 +1259,7 @@ async function callGeminiAPI(userText, modelIdx=0) {
       return;
     }
 
-    let reply = data.choices?.[0]?.message?.content || 'Бубахшед, ҷавоб нагирифтам 😔';
+    let reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Бубахшед, ҷавоб нагирифтам 😔';
     if (reply.length > MAX_RESPONSE_CHARS) reply = reply.slice(0, MAX_RESPONSE_CHARS - 3) + '...';
     chatHistory.push({ role: 'assistant', content: reply });
     addMsg('ai', reply);
