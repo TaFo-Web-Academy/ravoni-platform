@@ -476,6 +476,33 @@ html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bp)
 .pwat { font-size:14px; font-weight:600; color:#fff; margin-bottom:3px; }
 .pwas { font-size:11px; color:rgba(255,255,255,.7); font-weight:300; }
 .pwaa { margin-left:auto; color:rgba(255,255,255,.6); font-size:24px; }
+
+/* ── ДАР БОРАИ МО ── */
+.about-card {
+  background:var(--white); border-radius:var(--r); padding:16px;
+  margin-bottom:20px; border:1px solid var(--border); box-shadow:var(--shadow);
+}
+.about-title {
+  font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:600;
+  color:var(--green); margin-bottom:13px;
+}
+.about-video-wrap {
+  width:100%; border-radius:12px; overflow:hidden; margin-bottom:13px;
+  background:#000; aspect-ratio:16/9;
+}
+.about-video {
+  width:100%; height:100%; display:block; object-fit:cover;
+}
+.about-desc {
+  font-size:13px; line-height:1.75; color:var(--text); font-weight:300;
+  margin-bottom:13px;
+}
+.about-version {
+  font-size:12px; color:var(--muted); text-align:right; font-weight:300;
+}
+.about-version span {
+  font-weight:600; color:var(--green);
+}
 </style>
 </head>
 <body>
@@ -822,6 +849,20 @@ html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bp)
       </div>
       <div class="rbar"><div class="rfill" id="rFill" style="width:0%"></div></div>
     </div>
+
+    <!-- ══ ДАР БОРАИ МО ══ -->
+    <div class="about-card a4">
+      <div class="about-title">🌿 Дар Бораи Мо</div>
+      <div class="about-video-wrap">
+        <video class="about-video" controls playsinline preload="metadata" poster="">
+          <source src="Vidos2.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="about-desc">
+        Платформаи РАВОНИ — маркази шифои равонӣ дар Тоҷикистон. Мо бо роҳбарии равоншиноси касбӣ Ҷаннат Абдуллоева ба шумо кӯмак мекунем, ки захмҳои кӯдакиро шифо диҳед ва зиндагии солим созед. 🌱
+      </div>
+      <div class="about-version">Версия платформа: <span>v 0.6</span></div>
+    </div>
   </div>
 </div>
 
@@ -1051,7 +1092,7 @@ const AI_MODELS = [
   { id: 'gemini-flash-latest', label: 'Равонӣ — Модел 2', badge: 'РВ',
     intro: 'Салом! 👋 Ман Модели Дуюм ҳастам — зуд ва дақиқ ҷавоб медиҳам. Чӣ гуна ёрдам карда метавонам? 🌿' }
 ];
-const MAX_RESPONSE_CHARS = 2500;
+const MAX_RESPONSE_CHARS = 1500;
 const DAILY_MSG_LIMIT    = 15;
 
 const SYSTEM_PROMPT = `Ты AI-ассистент психологической платформы "РАВОНИ" (Таджикистан).
@@ -1059,10 +1100,10 @@ const SYSTEM_PROMPT = `Ты AI-ассистент психологической
 СТРОГИЕ ПРАВИЛА:
 - Отвечай ТОЛЬКО на таджикском языке (Тоҷикӣ)
 - Будь тёплым, поддерживающим, профессиональным
-- ВАЖНО: Ответ НЕ БОЛЕЕ 4-5-6 предложений — ясно и по делу! 
+- Ҷавоби мукаммал ва равшан бинавис — на хеле дароз, на хеле кӯтоҳ
 - Эмодзи — умеренно 🌿
 - ⛔ НЕ добавляй ссылки к каждому ответу!
-  Ссылки давай ТОЛЬКО если пользователь ПРЯМО спрашивает о покупке, о как встретится с менеджером, консультации или технической ошибке.
+  Ссылки давай ТОЛЬКО если пользователь ПРЯМО спрашивает о покупке, консультации или технической ошибке.
 
 О ПЛАТФОРМЕ:
 - Психолог: Ҷаннат Абдуллоева (5+ лет, 2300+ клиентов)
@@ -1233,7 +1274,7 @@ async function callGeminiAPI(userText, modelIdx=0) {
         systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
         contents: contents,
         generationConfig: {
-          maxOutputTokens: 400,
+          maxOutputTokens: 1024,
           temperature: 0.7
         }
       })
